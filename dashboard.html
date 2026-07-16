@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Researcher Workspace | M&R Analytics</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: #f8fafc;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Top Navigation Header */
+        header {
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(56, 189, 248, 0.1);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header h1 {
+            font-size: 1.2rem;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            color: #38bdf8;
+        }
+
+        .user-badge {
+            background: rgba(56, 189, 248, 0.1);
+            border: 1px solid #38bdf8;
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            color: #38bdf8;
+        }
+
+        /* Main Workspace Grid */
+        main {
+            flex: 1;
+            padding: 2rem;
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        /* Metrics Bar */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .metric-card {
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 1.5rem;
+            border-radius: 12px;
+        }
+
+        .metric-card h3 {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            color: #94a3b8;
+            margin-bottom: 0.5rem;
+        }
+
+        .metric-card p {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #f8fafc;
+        }
+
+        /* Core Analytic Control */
+        .workspace-box {
+            background: rgba(30, 41, 59, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 2.5rem;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .upload-zone {
+            border: 2px dashed rgba(56, 189, 248, 0.3);
+            border-radius: 12px;
+            padding: 3rem 2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .upload-zone:hover {
+            border-color: #38bdf8;
+            background: rgba(56, 189, 248, 0.02);
+        }
+
+        .upload-icon {
+            font-size: 2.5rem;
+            color: #38bdf8;
+            margin-bottom: 1rem;
+        }
+
+        .upload-btn {
+            background: #38bdf8;
+            color: #0f172a;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            font-weight: bold;
+            border-radius: 6px;
+            margin-top: 1rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .upload-btn:hover {
+            background: #0ea5e9;
+        }
+
+        /* Results / Analysis Panel */
+        .results-panel {
+            background: rgba(15, 23, 42, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 1.5rem;
+            min-height: 200px;
+            text-align: left;
+        }
+
+        .results-panel h2 {
+            font-size: 1.1rem;
+            color: #34d399;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+        }
+
+        .placeholder-text {
+            color: #64748b;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>M&R Research Analytics Hub</h1>
+        <div class="user-badge">Verified Researcher</div>
+    </header>
+
+    <main>
+        <!-- Top Metrics overview -->
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <h3>Datasets Analyzed</h3>
+                <p>0</p>
+            </div>
+            <div class="metric-card">
+                <h3>Total Rows Processed</h3>
+                <p>0</p>
+            </div>
+            <div class="metric-card">
+                <h3>System Status</h3>
+                <p style="color: #34d399;">Ready</p>
+            </div>
+        </div>
+
+        <!-- Main file analysis upload core -->
+        <div class="workspace-box">
+            <div class="upload-zone">
+                <div class="upload-icon">⎋</div>
+                <h3>Drag & Drop Raw Research Data</h3>
+                <p style="color: #64748b; margin-top: 0.5rem; font-size: 0.9rem;">Supports CSV, TSV, or Excel files</p>
+                <button class="upload-btn">Browse Local Files</button>
+            </div>
+        </div>
+
+        <!-- Section where results will compile live -->
+        <div class="results-panel">
+            <h2>Analysis Output Terminal</h2>
+            <p class="placeholder-text">No active data stream detected. Upload a dataset above to trigger background Python calculations...</p>
+        </div>
+    </main>
+
+</body>
+</html> 
