@@ -81,7 +81,7 @@ margin: 0 auto;
         const emailInput = document.querySelector('.input-field').value;
         
         // Ship the data to your local Python backend server
-        fetch('http://127.0.0.1:5000/submit-email', {
+        fetch(fetch('https://mr-analytics-hub.onrender.com/submit-email', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 from supabase import create_client, Client
 from dotenv import load_dotenv    # Loads variables from your hidden .env file
@@ -8,6 +8,9 @@ import os
 load_dotenv()
 
 app = Flask(__name__)
+@app.route('/')
+def home():
+    return send_from_directory('.', 'index.html')
 CORS(app)
 
 # 2. Grab your credentials securely from the environment
