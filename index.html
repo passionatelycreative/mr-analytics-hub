@@ -81,21 +81,25 @@ margin: 0 auto;
         const emailInput = document.querySelector('.input-field').value;
         
         // Ship the data to your local Python backend server
-        fetch(fetch('https://mr-analytics-hub.onrender.com/submit-email', {
+        fetch('https://mr-analytics-hub.onrender.com/submit-email', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({ email: emailInput })
         })
-        .then(response => response.json())
-        .then(data => {
-            if (data.status === 'success') {
-                // This is the magic link that automatically transfers the user to the dashboard
-                window.location.href = 'dashboard.html';
-            } else {
-                alert('Something went wrong on the server.');
+       .then(response => {
+            if (response.ok) {
+                return response.json();
             }
+            throw new Error('Network response was not ok.');
+        })
+        .then(data => {
+            // Display the success message on the page
+            document.getElementById('success-msg').style.display = 'block';
+            
+            // Redirect the user to the dashboard
+            window.location.href = '/dashboard.html';
         })
         .catch(error => {
             console.error('Error:', error);

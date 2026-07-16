@@ -6,13 +6,18 @@ import os
 
 # 1. Initialize the environment variable system
 load_dotenv()
-
 app = Flask(__name__)
+CORS(app)
+
+# 1. The Home Route (loads index.html)
 @app.route('/')
 def home():
     return send_from_directory('.', 'index.html')
-CORS(app)
 
+# 2. The Dashboard Route (loads dashboard.html)
+@app.route('/dashboard.html')
+def dashboard():
+    return send_from_directory('.', 'dashboard.html')
 # 2. Grab your credentials securely from the environment
 SUPABASE_URL = os.environ.get('SUPABASE_URL')
 SUPABASE_KEY = os.environ.get('SUPABASE_KEY')
