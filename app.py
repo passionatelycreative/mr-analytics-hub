@@ -19,11 +19,11 @@ def home():
 def dashboard():
     return send_from_directory('.', 'dashboard.html')
 # 2. Grab your credentials securely from the environment
-SUPABASE_URL = os.environ.get('SUPABASE_URL')
-SUPABASE_KEY = os.environ.get('SUPABASE_KEY')
+SUPABASE_URL = os.environ.get('SUPABASE_URL','')
+SUPABASE_KEY = os.environ.get('SUPABASE_KEY','')
 
 # 3. Establish the secure connection to your Supabase database cluster
-supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
+supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 @app.route('/submit-email', methods=['POST'])
 def handle_submit():
@@ -35,7 +35,7 @@ def handle_submit():
 
     try:
         # Push the researcher's email directly into your live cloud table
-        response = supabase.table('registrations').insert({"email": email}).execute()
+        supabase.table('registrations').insert({"email": email}).execute()
         
         print(f"[CLOUD SYNCED] Data safely injected into Supabase | Registered: {email}")
         return jsonify({"status": "success", "message": "Data tracked successfully"})

@@ -151,6 +151,7 @@
             font-style: italic;
         }
     </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.5.4/papaparse.min.js"></script>
 </head>
 <body>
 
@@ -192,6 +193,77 @@
             <p class="placeholder-text">No active data stream detected. Upload a dataset above to trigger background Python calculations...</p>
         </div>
     </main>
+    <!-- Script tag containing our logic -->
+    <script>
+    // Handle file selection and drag-and-drop
+const dropZone = document.querySelector('.workspace-box') || document.querySelector('.border-dashed');
+const fileInput = document.createElement('input');
+fileInput.type = 'file';
+fileInput.accept = '.csv';
+fileInput.style.display = 'none';
+document.body.appendChild(fileInput);
 
-</body>
-</html> 
+// Trigger file explorer when clicking inside the workspace box
+if (dropZone) {
+    dropZone.addEventListener('click', () => fileInput.click());
+
+    // Highlight border on drag over
+    dropZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dropZone.style.border = '2px dashed #00f2fe';
+    });
+
+    dropZone.addEventListener('dragleave', () => {
+        dropZone.style.border = '';
+    });
+
+    // Handle dropped file
+    dropZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropZone.style.border = '';
+        const files = e.dataTransfer.files;
+        if (files.length) handleCSV(files[0]);
+    });
+}
+
+// Handle file selection from explorer
+fileInput.addEventListener('change', (e) => {
+    if (e.target.files.length) handleCSV(e.target.files[0]);
+});
+
+// Global dataset holder
+let currentDataset = null;
+
+// Parse the file using our PapaParse library
+function handleCSV(file) {
+    const terminal = document.querySelector('.results-panel p');
+    if (terminal) {
+        terminal.textContent = 'Processing and parsing dataset...';
+    }
+
+    Papa.parse(file, {
+        header: true,
+        dynamicTyping: true,
+       skipEmptyLines: true,
+        complete: function(results) {
+            currentDataset = results.data;
+            displayMetrics(results.data, file.name);
+        }
+    });
+}
+// Update the output terminal with calculations
+function displayMetrics(data, fileName) {
+    const terminal = document.querySelector('.results-panel p');
+    if (terminal) {
+        const totalRows = data.length;
+        const columns = Object.keys(data[0] || {});
+        terminal.style.fontFamily = 'monospace';
+        terminal.style.whiteSpace = 'pre-line';
+        terminal.innerHTML = `
+<span style="color: #4ade80">> SUCCESS: Loaded "${fileName}"</span><br/>
+<span style="color: #60a5fa">> Total Records:</span> ${totalRows}<br/>
+<span style="color: #60a5fa">> Columns Found:</span> [${columns.join(', ')}]<br/>
+<span style="color: #c084fc">> Summary:</span> Data successfully compiled in local memory!
+ `;
+    }
+}
