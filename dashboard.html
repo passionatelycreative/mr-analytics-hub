@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Researcher Workspace | M&R Analytics</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: #f8fafc;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Top Navigation Header */
+        header {
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(56, 189, 248, 0.1);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header h1 {
+            font-size: 1.2rem;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            color: #38bdf8;
+        }
+
+        .user-badge {
+            background: rgba(56, 189, 248, 0.1);
+            border: 1px solid #38bdf8;
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            color: #38bdf8;
+        }
+
+        /* Main Workspace Grid */
+        main {
+            flex: 1;
+            padding: 2rem;
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        /* Metrics Bar */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .metric-card {
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 1.5rem;
+            border-radius: 12px;
+        }
+
+        .metric-card h3 {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            color: #94a3b8;
+            margin-bottom: 0.5rem;
+        }
+
+        .metric-card p {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #f8fafc;
+        }
+
+        /* Core Analytic Control */
+        .workspace-box {
+            background: rgba(30, 41, 59, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 2.5rem;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .upload-zone {
+            border: 2px dashed rgba(56, 189, 248, 0.3);
+            border-radius: 12px;
+            padding: 3rem 2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .upload-zone:hover {
+            border-color: #38bdf8;
+            background: rgba(56, 189, 248, 0.02);
+        }
+
+        .upload-icon {
+            font-size: 2.5rem;
+            color: #38bdf8;
+            margin-bottom: 1rem;
+        }
+
+        .upload-btn {
+            background: #38bdf8;
+            color: #0f172a;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            font-weight: bold;
+            border-radius: 6px;
+            margin-top: 1rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .upload-btn:hover {
+            background: #0ea5e9;
+        }
+
+        /* Results / Analysis Panel */
+        .results-panel {
+            background: rgba(15, 23, 42, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 1.5rem;
+            min-height: 200px;
+            text-align: left;
+        }
+
+        .results-panel h2 {
+            font-size: 1.1rem;
+            color: #34d399;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+        }
+
+        .placeholder-text {
+            color: #64748b;
+            font-style: italic;
+        }
+    </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.5.4/papaparse.min.js"></script>
+</head>
+<body>
+
+    <header>
+        <h1>M&R Research Analytics Hub</h1>
+        <div class="user-badge">Verified Researcher</div>
+    </header>
+
+    <main>
+        <!-- Top Metrics overview -->
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <h3>Datasets Analyzed</h3>
+                <p>0</p>
+            </div>
+            <div class="metric-card">
+                <h3>Total Rows Processed</h3>
+                <p>0</p>
+            </div>
+            <div class="metric-card">
+                <h3>System Status</h3>
+                <p style="color: #34d399;">Ready</p>
+            </div>
+        </div>
+<!-- Chart Container -->
+<div style="position: relative; width: 100%; max-width: 650px; margin: 20px auto;">
+  <canvas id="myAnalyticsChart"></canvas>
+</div>
+        <!-- Main file analysis upload core -->
+        <div class="workspace-box">
+            <div class="upload-zone">
+                <div class="upload-icon">⎋</div>
+                <h3>Drag & Drop Raw Research Data</h3>
+                <p style="color: #64748b; margin-top: 0.5rem; font-size: 0.9rem;">Supports CSV, TSV, or Excel files</p>
+                <button class="upload-btn" id="browseBtn">Browse Local Files</button>
+                <input type="file" id="csvFileInput" accept=".csv" style="display: none;">
+            <button type="button" id="processCsvBtn" class="upload-btn" style="margin-top: 15px; background-color: #2563eb;">
+    Upload & Process CSV
+           </button>
+        </div>
+
+        <!-- Section where results will compile live -->
+        <div class="results-panel">
+            <h2>Analysis Output Terminal</h2>
+            <p class="placeholder-text">No active data stream detected. Upload a dataset above to trigger background Python calculations...</p>
+        </div>
+    </main>
+    <!-- Script tag containing our logic -->
+     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+    // Handle file selection and drag-and-drop
+// Grab HTML elements
+const browseBtn = document.getElementById('browseBtn');
+const fileInput = document.getElementById('csvFileInput');
+const processBtn = document.getElementById('processCsvBtn');
+const dropZone = document.querySelector('.upload-zone');
+browseBtn.onclick = () => {
+    fileInput.click();
+};
+let selectedFile = null;
+
+    fileInput.addEventListener('change', (e) => {
+        if (e.target.files.length > 0) {
+            selectedFile = e.target.files[0];
+            browseBtn.textContent = `Selected: ${selectedFile.name}`;
+            browseBtn.style.backgroundColor = '#10b981';
+        }
+    });
+
+// Send file to Flask when "Upload & Process CSV" is clicked
+if (processBtn) {
+    processBtn.addEventListener('click', () => {
+        if (!selectedFile) {
+            alert("Please select a CSV file first!");
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('file', selectedFile);
+
+        processBtn.textContent = "Processing...";
+
+        fetch('http://127.0.0.1:5000/upload', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => {
+            if (!response.ok) throw new Error(`Server error: ${response.status}`);
+            return response.json();
+        })
+        .then(data => {
+            console.log("Data from Flask:", data);
+            processBtn.textContent = "Upload & Process CSV";
+            if (typeof handleCSV === 'function') {
+                handleCSV(selectedFile);
+            }
+        })
+        .catch(error => {
+            console.error("Error connecting to server:", error);
+            alert("Could not reach Flask backend. Check terminal!");
+            processBtn.textContent = "Upload & Process CSV";
+        });
+    });
+}
+    dropZone.addEventListener('click', () => fileInput.click());
+
+    // Highlight border on drag over
+    dropZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dropZone.style.border = '2px dashed #00f2fe';
+    });
+
+    dropZone.addEventListener('dragleave', () => {
+        dropZone.style.border = '';
+    });
+
+    // Handle dropped file
+    dropZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropZone.style.border = '';
+        const files = e.dataTransfer.files;
+        if (files.length) handleCSV(files[0]);
+    });
+
+// Handle file selection from explorer
+fileInput.addEventListener('change', (e) => {
+    console.log('FILE CHANGE DETECTED');
+
+    if (e.target.files.length) {
+        console.log('FILE SELECTED:', e.target.files[0].name);
+        handleCSV(e.target.files[0]);
+    } else {
+        console.log('NO FILE SELECTED');
+    }
+});
+
+// Global dataset holder
+let currentDataset = null;
+
+// Parse the file using our PapaParse library
+function handleCSV(file) {
+    const terminal = document.querySelector('.results-panel p');
+    if (terminal) {
+        terminal.textContent = 'Processing and parsing dataset...';
+    }
+
+    Papa.parse(file, {
+        header: true,
+        dynamicTyping: true,
+        skipEmptyLines: true,
+        complete: function(results) {
+            currentDataset = results.data;
+            displayMetrics(results.data, file.name);
+            // Automatically draw a chart using the first two columns!
+            const cols = Object.keys(results.data[0] || {});
+            if (cols.length >= 2) {
+                drawChart(results.data, cols[0], cols[1], 'bar');
+            }
+        }
+    });
+}
+// Update the output terminal with calculations
+function displayMetrics(data, fileName) {
+    const terminal = document.querySelector('.results-panel p');
+    if (terminal) {
+        const totalRows = data.length;
+        const columns = Object.keys(data[0] || {});
+        terminal.style.fontFamily = 'monospace';
+        terminal.style.whiteSpace = 'pre-line';
+        terminal.innerHTML = `
+<span style="color: #4ade80">> SUCCESS: Loaded "${fileName}"</span><br/>
+<span style="color: #60a5fa">> Total Records:</span> ${totalRows}<br/>
+<span style="color: #60a5fa">> Columns Found:</span> [${columns.join(', ')}]<br/>
+<span style="color: #c084fc">> Summary:</span> Data successfully compiled in local memory!
+ `;
+    }
+}
+// --- CHART RENDERING LOGIC ---
+let chartInstance = null;
+
+function drawChart(parsedCsvData, xAxisKey, yAxisKey, type = 'bar') {
+  const labels = parsedCsvData.map(row => row[xAxisKey]);
+  const dataPoints = parsedCsvData.map(row => Number(row[yAxisKey]) || 0);
+
+  const ctx = document.getElementById('myAnalyticsChart').getContext('2d');
+
+  if (chartInstance) {
+    chartInstance.destroy();
+  }
+
+  chartInstance = new Chart(ctx, {
+    type: type,
+    data: {
+      labels: labels,
+      datasets: [{
+        label: `${yAxisKey} vs ${xAxisKey}`,
+        data: dataPoints,
+        backgroundColor: 'rgba(54, 162, 235, 0.5)',
+        borderColor: 'rgba(54, 162, 235, 1)',
+        borderWidth: 2
+      }]
+    },
+    options: {
+      responsive: true
+    }
+  });
+}
+
+// Temporary test call
+drawChart([
+  { Month: 'Jan', Sales: 100 },
+  { Month: 'Feb', Sales: 250 },
+  { Month: 'Mar', Sales: 180 }
+], 'Month', 'Sales', 'bar');

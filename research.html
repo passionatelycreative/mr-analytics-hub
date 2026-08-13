@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>M&R Analytics | Research</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
+                         Roboto, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #0f172a, #1e293b);
+            color: #f8fafc;
+        }
+
+        header {
+            padding: 1.5rem 2rem;
+            background: rgba(15, 23, 42, 0.8);
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+
+        header h1 {
+            color: #38bdf8;
+            font-size: 1.3rem;
+            letter-spacing: 0.05em;
+        }
+
+        main {
+            max-width: 1200px;
+            margin: auto;
+            padding: 3rem 2rem;
+        }
+
+        .intro {
+            margin-bottom: 2.5rem;
+        }
+
+        .intro h2 {
+            font-size: 2.3rem;
+            margin-bottom: 0.7rem;
+        }
+
+        .intro p {
+            color: #94a3b8;
+        }
+
+        .research-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+        }
+
+        .research-card {
+            background: rgba(30,41,59,0.65);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 16px;
+            padding: 2rem;
+        }
+
+        .research-card h3 {
+            margin-bottom: 0.7rem;
+        }
+
+        .research-card p {
+            color: #94a3b8;
+            line-height: 1.6;
+        }
+
+        .research-btn {
+            display: inline-block;
+            margin-top: 1.5rem;
+            padding: 0.7rem 1.1rem;
+            border-radius: 7px;
+            background: #38bdf8;
+            color: #0f172a;
+            text-decoration: none;
+            font-weight: 700;
+        }
+
+        .back-btn {
+            display: inline-block;
+            margin-top: 2.5rem;
+            color: #94a3b8;
+            text-decoration: none;
+        }
+
+        @media (max-width: 800px) {
+            .research-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h1>M&R ANALYTICS</h1>
+</header>
+
+<main>
+
+    <section class="intro">
+        <h2>Research Workspace</h2>
+        <p>
+            Explore financial research, market intelligence and analytical insights.
+        </p>
+    </section>
+
+    <section class="research-grid">
+
+        <div class="research-card">
+            <h3>📊 Market Research</h3>
+            <p>
+                Research markets, companies, industries and economic trends.
+            </p>
+            <a href="#" class="research-btn">Open Research</a>
+        </div>
+
+        <div class="research-card">
+            <h3>🔎 Investment Research</h3>
+            <p>
+                Analyze investment opportunities and evaluate financial information.
+            </p>
+            <a href="#" class="research-btn">Explore Investments</a>
+        </div>
+
+        <div class="research-card">
+            <h3>🧠 AI Research Assistant</h3>
+            <p>
+                Use intelligent analysis to investigate financial and business questions.
+            </p>
+            <a href="#" class="research-btn">Open Assistant</a>
+        </div>
+
+    </section>
+
+    <a href="platform.html" class="back-btn">
+        ← Back to Platform Hub
+    </a>
+
+</main>
+
+</body>
+</html>

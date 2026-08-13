@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | M&R Analytics</title>
+</head>
+
+<body>
+
+    <h1>Login to M&R Analytics</h1>
+
+    <form id="loginForm">
+
+        <input
+            type="email"
+            id="email"
+            placeholder="Email address"
+            required
+        >
+
+        <input
+            type="password"
+            id="password"
+            placeholder="Password"
+            required
+        >
+
+        <button type="submit">
+            Login
+        </button>
+
+    </form>
+
+    <p id="message"></p>
+
+
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <script>
+
+        const SUPABASE_URL = "https://hlxlchoslbejmivwrgzi.supabase.co";
+        const SUPABASE_ANON_KEY = "sb_publishable_tDWf8vEEhHs8QIcBpxajfg_rL0D-WI2";
+
+        const supabaseClient = window.supabase.createClient(
+            SUPABASE_URL,
+            SUPABASE_ANON_KEY
+        );
+
+
+        document
+            .getElementById("loginForm")
+            .addEventListener("submit", async function(event) {
+
+                event.preventDefault();
+
+                const email =
+                    document.getElementById("email").value;
+
+                const password =
+                    document.getElementById("password").value;
+
+                const message =
+                    document.getElementById("message");
+
+                message.textContent = "Logging in...";
+
+
+                const { data, error } =
+                    await supabaseClient.auth.signInWithPassword({
+                        email: email,
+                        password: password
+                    });
+
+
+                if (error) {
+
+                    console.error(error);
+
+                    message.textContent =
+                        error.message;
+
+                    return;
+                }
+
+
+                console.log("Logged in user:", data.user);
+
+                message.textContent =
+                    "Login successful!";
+
+
+                window.location.href =
+                    "/platform.html";
+
+            });
+
+    </script>
+
+</body>
+</html>

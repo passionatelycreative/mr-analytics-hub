@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My First Dev Project</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #0f172a;
+            color: #f8fafc;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container 
+    /* Your container styles will go here later */
+        h1 {
+            color: #38bdf8;
+            margin-bottom: 0.5rem;
+        }
+        p {
+            color: #94a3b8;
+            font-size: 1.1rem;
+        }
+        .button-link {
+    display: block;
+margin: 0 auto;
+    background-color: #38bdf8; /* Sleek sky blue background */
+    color: #0f172a;            /* Dark text color for contrast */
+    padding: 0.75rem 1.5rem;   /* Padding makes it a box shape */
+    border-radius: 8px;        /* Rounded modern corners */
+    text-decoration: none;     /* Removes the default underline */
+    font-weight: bold;
+    transition: background-color 0.3s ease; /* Smooth transition animation */
+}
+.input-field {
+    display: block;
+    width: 80%;
+    max-width: 300px;
+    margin: 0 auto 1.5rem auto; /* Centers the box and leaves space below it */
+    padding: 0.75rem;
+    border: 2px solid #334155;
+    border-radius: 8px;
+    background-color: #0f172a;
+    color: #f8fafc;
+    font-size: 1rem;
+    outline: none;
+    transition: border-color 0.3s ease;
+}
+/* This makes the border glow blue when a user clicks into it */
+.input-field:focus {
+    border-color: #38bdf8;
+}.success-text {
+    color: #34d399;
+    font-weight: bold;
+    margin-top: 1.5rem;
+    font-size: 1.1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+</style>
+<body>
+    <div class="container">
+        <h1>welcome to M&R RESEARCH inc.</h1>
+        <p>I LOVE YOU SO MUCH Richard.</p>
+        <p>where top analysis still exist in todays world</p>
+
+        <form id="lead-form">
+            <input type="email" placeholder="Enter your email address" class="input-field" required>
+            <button type="submit" class="button-link" style="border: none; cursor: pointer; width: auto;">REGISTER</button>
+        </form>
+        <p id="success-msg" class="success-text" style="display: none;">Thank you! Your analysis is preparing...</p>
+    </div><div style="position: relative; width: 100%; max-width: 600px; margin: 20px auto;">
+  <canvas id="myAnalyticsChart"></canvas>
+</div>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.getElementById('lead-form').addEventListener('submit', function(event) {
+        event.preventDefault();
+        
+        const emailInput = document.querySelector('.input-field').value;
+        
+        // Ship the data to your local Python backend server
+        fetch('https://mr-analytics-hub.onrender.com/submit-email', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ email: emailInput })
+        })
+       .then(response => {
+            if (response.ok) {
+                return response.json();
+            }
+            throw new Error('Network response was not ok.');
+        })
+        .then(data => {
+            // Display the success message on the page
+            document.getElementById('success-msg').style.display = 'block';
+            
+            // Redirect the user to the dashboard
+            window.location.href = '/dashboard.html';
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Cannot connect to Python server. Is app.py running?');
+        });
+    });
+</script>
+</body>
+</html>
