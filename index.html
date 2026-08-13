@@ -17,6 +17,13 @@
         }
         .container 
     /* Your container styles will go here later */
+        {
+            max-width: 720px;
+            width: 100%;
+            padding: 2rem;
+            box-sizing: border-box;
+            text-align: center;
+        }
         h1 {
             color: #38bdf8;
             margin-bottom: 0.5rem;
@@ -68,47 +75,85 @@ margin: 0 auto;
         <p>I LOVE YOU SO MUCH Richard.</p>
         <p>where top analysis still exist in todays world</p>
 
-        <form id="lead-form">
-            <input type="email" placeholder="Enter your email address" class="input-field" required>
-            <button type="submit" class="button-link" style="border: none; cursor: pointer; width: auto;">REGISTER</button>
-        </form>
+       <form id="lead-form">
+    <input
+        type="email"
+        id="register-email"
+        placeholder="Enter your email address"
+        class="input-field"
+        required
+    >
+
+    <input
+        type="password"
+        id="register-password"
+        placeholder="Create a password"
+        class="input-field"
+        required
+        minlength="6"
+    >
+
+    <button
+        type="submit"
+        class="button-link"
+        style="border: none; cursor: pointer; width: auto;"
+    >
+        REGISTER
+    </button>
+</form>
         <p id="success-msg" class="success-text" style="display: none;">Thank you! Your analysis is preparing...</p>
     </div><div style="position: relative; width: 100%; max-width: 600px; margin: 20px auto;">
   <canvas id="myAnalyticsChart"></canvas>
 </div>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <script>
-    document.getElementById('lead-form').addEventListener('submit', function(event) {
-        event.preventDefault();
-        
-        const emailInput = document.querySelector('.input-field').value;
-        
-        // Ship the data to your local Python backend server
-        fetch('https://mr-analytics-hub.onrender.com/submit-email', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ email: emailInput })
-        })
-       .then(response => {
-            if (response.ok) {
-                return response.json();
-            }
-            throw new Error('Network response was not ok.');
-        })
-        .then(data => {
-            // Display the success message on the page
-            document.getElementById('success-msg').style.display = 'block';
-            
-            // Redirect the user to the dashboard
-            window.location.href = '/dashboard.html';
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('Cannot connect to Python server. Is app.py running?');
+    const SUPABASE_URL = "https://hlxlchoslbejmivwrgzi.supabase.co";
+    const SUPABASE_ANON_KEY = "sb_publishable_tDWf8vEEhHs8QIcBpxajfg_rL0D-WI2";
+
+    const supabaseClient = window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_ANON_KEY
+    );
+</script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.getElementById('lead-form').addEventListener('submit', async function(event) {
+    event.preventDefault();
+
+    const email = document.getElementById('register-email').value.trim();
+    const password = document.getElementById('register-password').value;
+    const successMessage = document.getElementById('success-msg');
+
+    try {
+        successMessage.style.display = 'none';
+
+        const { data, error } = await supabaseClient.auth.signUp({
+            email: email,
+            password: password
         });
-    });
+
+        if (error) {
+            throw error;
+        }
+
+        console.log("Registered user:", data.user);
+
+        successMessage.textContent =
+            "Registration successful. You can now log in.";
+
+        successMessage.style.display = 'block';
+
+        setTimeout(() => {
+            window.location.href = '/login.html';
+        }, 1500);
+
+    } catch (error) {
+        console.error("Registration error:", error);
+
+        alert(error.message);
+    }
+});
 </script>
 </body>
 </html>

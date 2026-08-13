@@ -195,24 +195,59 @@
 </section>
 
 </body>
-</html>
+</html><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+const SUPABASE_URL = "https://hlxlchoslbejmivwrgzi.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_tDWf8vEEhHs8QIcBpxajfg_rL0D-WI2";
+
+const supabaseClient = window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_ANON_KEY
+);
+</script>
 <script>
 async function loadAccount() {
     try {
-        const response = await fetch('/api/account');
+        const {
+            data: { session },
+            error: sessionError
+        } = await supabaseClient.auth.getSession();
+
+        if (sessionError) {
+            throw sessionError;
+        }
+
+        if (!session) {
+            console.error("No authenticated user found.");
+            window.location.href = "/login.html";
+            return;
+        }
+
+        const response = await fetch('/api/account', {
+            headers: {
+                'Authorization': `Bearer ${session.access_token}`
+            }
+        });
 
         if (!response.ok) {
-            throw new Error('Could not load account');
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Could not load account');
         }
 
         const data = await response.json();
         const account = data.account;
 
         document.getElementById('totalBalance').textContent =
-            `$${Number(account.fiat_balance_usd).toLocaleString()}`;
+            `$${Number(account.fiat_balance_usd).toLocaleString(undefined, {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            })}`;
 
         document.getElementById('cryptoBalance').textContent =
             `${Number(account.btc_balance).toFixed(4)} BTC`;
+
+        console.log("Account loaded:", account);
 
     } catch (error) {
         console.error('Account loading error:', error);
@@ -220,4 +255,5 @@ async function loadAccount() {
 }
 
 loadAccount();
+</script>
 </script>

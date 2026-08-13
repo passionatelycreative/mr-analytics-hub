@@ -19,18 +19,96 @@ load_dotenv()
 
 app = Flask(__name__)
 CORS(app)
+@app.route('/register', methods=['POST'])
+def register():
+    try:
+        data = request.get_json()
+
+        email = data.get('email', '').strip()
+
+        if not email:
+            return jsonify({
+                "status": "error",
+                "message": "Email is required"
+            }), 400
+
+        response = supabase.auth.sign_up({
+            "email": email
+        })
+
+        return jsonify({
+            "status": "success",
+            "message": "Registration received",
+            "email": email
+        })
+
+    except Exception as e:
+        return jsonify({
+            "status": "error",
+            "message": str(e)
+        }), 500
 
 @app.route('/api/account')
 def get_account():
-    # Placeholder account response
-    return jsonify({
-        "status": "success",
-        "account": {
-            "id": None,
-            "name": "",
-            "email": ""
-        }
-    })
+    try:
+        # Get the user's Supabase access token
+        auth_header = request.headers.get("Authorization")
+
+        if not auth_header or not auth_header.startswith("Bearer "):
+            return jsonify({
+                "status": "error",
+                "message": "Authentication required"
+            }), 401
+
+        access_token = auth_header.split(" ", 1)[1]
+
+        # Ask Supabase who this token belongs to
+        user_response = supabase.auth.get_user(access_token)
+
+        if not user_response or not user_response.user:
+            return jsonify({
+                "status": "error",
+                "message": "Invalid authentication token"
+            }), 401
+
+        user = user_response.user
+        user_id = user.id
+
+        # Find this user's financial account
+        account_response = (
+            supabase
+            .table("accounts")
+            .select("id, user_id, fiat_balance_usd, btc_balance, eth_balance")
+            .eq("user_id", user_id)
+            .single()
+            .execute()
+        )
+
+        account = account_response.data
+
+        if not account:
+            return jsonify({
+                "status": "error",
+                "message": "Account not found"
+            }), 404
+
+        return jsonify({
+            "status": "success",
+            "account": {
+                "id": account["id"],
+                "user_id": account["user_id"],
+                "email": user.email,
+                "fiat_balance_usd": account["fiat_balance_usd"],
+                "btc_balance": account["btc_balance"],
+                "eth_balance": account["eth_balance"]
+            }
+        })
+
+    except Exception as e:
+        return jsonify({
+            "status": "error",
+            "message": str(e)
+        }), 500
 
 # 2. Home Route
 @app.route('/')
@@ -46,6 +124,11 @@ def dashboard():
 @app.route('/platform.html')
 def platform():
     return send_from_directory('.', 'platform.html')
+
+@app.route('/login.html')
+def login():
+    return send_from_directory('.', 'login.html')
+
 @app.route('/banking.html')
 def banking():
     return send_from_directory('.', 'banking.html')
