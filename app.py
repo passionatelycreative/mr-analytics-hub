@@ -171,7 +171,71 @@ def upload_file():
 @app.route('/research.html')
 def research():
     return send_from_directory('.', 'research.html')
+@app.route('/api/transactions', methods=['GET'])
+def get_transactions():
+    try:
+        # 1. Get the authenticated user's Supabase access token
+        auth_header = request.headers.get("Authorization")
 
+        if not auth_header or not auth_header.startswith("Bearer "):
+            return jsonify({
+                "status": "error",
+                "message": "Authentication required"
+            }), 401
+
+        access_token = auth_header.split(" ", 1)[1]
+
+        # 2. Verify the token with Supabase
+        user_response = supabase.auth.get_user(access_token)
+
+        if not user_response or not user_response.user:
+            return jsonify({
+                "status": "error",
+                "message": "Invalid authentication token"
+            }), 401
+
+        user_id = user_response.user.id
+
+        # 3. Find the user's account
+        account_response = (
+            supabase
+            .table("accounts")
+            .select("id")
+            .eq("user_id", user_id)
+            .single()
+            .execute()
+        )
+
+        account = account_response.data
+
+        if not account:
+            return jsonify({
+                "status": "error",
+                "message": "Account not found"
+            }), 404
+
+        account_id = account["id"]
+
+        # 4. Retrieve transactions belonging to this account
+        transactions_response = (
+            supabase
+            .table("transactions")
+            .select("*")
+            .eq("account_id", account_id)
+            .order("created_at", desc=True)
+            .execute()
+        )
+
+        return jsonify({
+            "status": "success",
+            "transactions": transactions_response.data or []
+        })
+
+    except Exception as e:
+        return jsonify({
+            "status": "error",
+            "message": str(e)
+        }), 500
 if __name__ == '__main__':
     app.run(debug=True)
 
