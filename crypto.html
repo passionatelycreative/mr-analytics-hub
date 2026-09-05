@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crypto Market Intelligence | M&R Analytics</title>
+    <link rel="stylesheet" href="static/css/mr-analytics.css">
+    <style>
+        .crypto-toolbar { display: flex; flex-wrap: wrap; gap: 1rem; align-items: end; justify-content: space-between; margin-top: 2rem; }
+        .crypto-search { display: grid; gap: .45rem; color: var(--ma-muted); font-size: .9rem; }
+        .crypto-search input { width: min(100%, 280px); min-height: 42px; border: 1px solid var(--ma-border); border-radius: 7px; padding: .65rem .75rem; background: var(--ma-bg-elevated); color: var(--ma-text); font: inherit; }
+        .crypto-search input:focus { border-color: var(--ma-accent); outline: none; }
+        .crypto-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-top: 1rem; }
+        .crypto-market-card { border: 1px solid var(--ma-border); border-radius: var(--ma-radius); padding: 1.15rem; background: var(--ma-surface); box-shadow: var(--ma-shadow); }
+        .crypto-market-card h2 { margin: 0; font-size: 1.15rem; }
+        .crypto-price { margin: .8rem 0 .2rem; font-size: 1.45rem; font-weight: 750; }
+        .crypto-change { margin: 0; font-weight: 700; }
+        .crypto-change.positive { color: var(--ma-positive); }
+        .crypto-change.negative { color: var(--ma-negative); }
+        .crypto-detail { margin: .5rem 0 0; color: var(--ma-muted); font-size: .86rem; }
+        .crypto-empty { color: var(--ma-muted); margin: 2rem 0; }
+    </style>
+</head>
+<body class="ma-app">
+    <header class="ma-header">
+        <div class="ma-shell ma-header-inner">
+            <a class="ma-brand" href="platform.html">M&R <span>Analytics</span></a>
+            <nav class="ma-nav" aria-label="Primary">
+                <a href="platform.html">Platform Hub</a>
+                <a href="banking.html">Banking</a>
+                <a href="dashboard.html">Data Analytics</a>
+                <a href="crypto-portfolio.html">Crypto Portfolio</a>
+            </nav>
+        </div>
+    </header>
+    <main class="ma-shell ma-page">
+        <p class="ma-eyebrow">Market Intelligence</p>
+        <h1 class="ma-page-title">Crypto Analytics</h1>
+        <p class="ma-page-copy">Live market data for the currently supported assets. Search filters the live market set without fabricating additional asset coverage.</p>
+        <section aria-labelledby="market-heading">
+            <div class="crypto-toolbar">
+                <div>
+                    <h2 id="market-heading">Live Market</h2>
+                    <p class="ma-status" id="cryptoMarketStatus" role="status" aria-live="polite">Loading market data...</p>
+                </div>
+                <label class="crypto-search" for="cryptoSearch">Filter assets<input id="cryptoSearch" type="search" placeholder="BTC, ETH, SOL, ADA, XRP"></label>
+            </div>
+            <div class="crypto-grid" id="cryptoMarketGrid" aria-live="polite"></div>
+            <p class="crypto-empty" id="cryptoEmpty" hidden>No supported assets match this filter.</p>
+        </section>
+    </main>
+    <script>
+        const cryptoMarketStatus = document.getElementById("cryptoMarketStatus");
+        const cryptoMarketGrid = document.getElementById("cryptoMarketGrid");
+        const cryptoSearch = document.getElementById("cryptoSearch");
+        const cryptoEmpty = document.getElementById("cryptoEmpty");
+        const cryptoPollInterval = 5000;
+        let cryptoAssets = [];
+
+        function formatUsd(value) {
+            return Number(value).toLocaleString(undefined, { style: "currency", currency: "USD", maximumFractionDigits: 8 });
+        }
+
+        function formatCompactUsd(value) {
+            return Number(value).toLocaleString(undefined, { style: "currency", currency: "USD", notation: "compact", maximumFractionDigits: 2 });
+        }
+
+        function addDetail(card, text) {
+            const detail = document.createElement("p");
+            detail.className = "crypto-detail";
+            detail.textContent = text;
+            card.appendChild(detail);
+        }
+
+        function renderCryptoAssets() {
+            const filter = cryptoSearch.value.trim().toUpperCase();
+            const assets = cryptoAssets.filter((asset) => asset.symbol.includes(filter));
+            cryptoMarketGrid.replaceChildren();
+            cryptoEmpty.hidden = assets.length !== 0;
+            assets.forEach((asset) => {
+                const card = document.createElement("article");
+                card.className = "crypto-market-card";
+                const symbol = document.createElement("h2");
+                symbol.textContent = asset.symbol;
+                const price = document.createElement("p");
+                price.className = "crypto-price";
+                price.textContent = formatUsd(asset.price_usd);
+                const change = document.createElement("p");
+                change.className = `crypto-change ${asset.change_24h_percent >= 0 ? "positive" : "negative"}`;
+                change.textContent = `${asset.change_24h_percent.toFixed(2)}% (24h)`;
+                card.append(symbol, price, change);
+                addDetail(card, `Volume: ${formatCompactUsd(asset.volume_24h_usd)}`);
+                addDetail(card, `Market cap: ${formatCompactUsd(asset.market_cap_usd)}`);
+                addDetail(card, `Provider update: ${new Date(asset.updated_at).toLocaleString()}`);
+                cryptoMarketGrid.appendChild(card);
+            });
+        }
+
+        async function updateCryptoMarket() {
+            try {
+                const response = await fetch("/api/crypto", { cache: "no-store" });
+                const payload = await response.json();
+                if (!response.ok && payload.status !== "stale") throw new Error(payload.message || "Market data unavailable");
+                if (!Array.isArray(payload.assets) || payload.assets.length !== 5) throw new Error("Market data is incomplete");
+                cryptoAssets = payload.assets;
+                renderCryptoAssets();
+                const stale = payload.status === "stale";
+                cryptoMarketStatus.className = `ma-status ${stale ? "" : "ma-status-live"}`;
+                cryptoMarketStatus.textContent = stale
+                    ? `${payload.message} Last successful update: ${new Date(payload.updated_at).toLocaleString()}`
+                    : `Live update received: ${new Date(payload.updated_at).toLocaleString()}`;
+            } catch (error) {
+                cryptoMarketStatus.className = "ma-status";
+                cryptoMarketStatus.textContent = "Market data temporarily unavailable. Existing market data is unchanged.";
+            }
+        }
+
+        cryptoSearch.addEventListener("input", renderCryptoAssets);
+        updateCryptoMarket();
+        setInterval(updateCryptoMarket, cryptoPollInterval);
+    </script>
+</body>
+</html>

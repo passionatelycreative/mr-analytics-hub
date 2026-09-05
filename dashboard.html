@@ -5,364 +5,191 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Researcher Workspace | M&R Analytics</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-        }
-
-        body {
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-            color: #f8fafc;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-
-        /* Top Navigation Header */
-        header {
-            background: rgba(15, 23, 42, 0.8);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(56, 189, 248, 0.1);
-            padding: 1rem 2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        header h1 {
-            font-size: 1.2rem;
-            letter-spacing: 0.05em;
-            text-transform: uppercase;
-            color: #38bdf8;
-        }
-
-        .user-badge {
-            background: rgba(56, 189, 248, 0.1);
-            border: 1px solid #38bdf8;
-            padding: 0.4rem 1rem;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            color: #38bdf8;
-        }
-
-        /* Main Workspace Grid */
-        main {
-            flex: 1;
-            padding: 2rem;
-            max-width: 1200px;
-            width: 100%;
-            margin: 0 auto;
-        }
-
-        /* Metrics Bar */
-        .metrics-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 2rem;
-        }
-
-        .metric-card {
-            background: rgba(30, 41, 59, 0.5);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            padding: 1.5rem;
-            border-radius: 12px;
-        }
-
-        .metric-card h3 {
-            font-size: 0.85rem;
-            text-transform: uppercase;
-            color: #94a3b8;
-            margin-bottom: 0.5rem;
-        }
-
-        .metric-card p {
-            font-size: 1.8rem;
-            font-weight: bold;
-            color: #f8fafc;
-        }
-
-        /* Core Analytic Control */
-        .workspace-box {
-            background: rgba(30, 41, 59, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 16px;
-            padding: 2.5rem;
-            text-align: center;
-            margin-bottom: 2rem;
-        }
-
-        .upload-zone {
-            border: 2px dashed rgba(56, 189, 248, 0.3);
-            border-radius: 12px;
-            padding: 3rem 2rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .upload-zone:hover {
-            border-color: #38bdf8;
-            background: rgba(56, 189, 248, 0.02);
-        }
-
-        .upload-icon {
-            font-size: 2.5rem;
-            color: #38bdf8;
-            margin-bottom: 1rem;
-        }
-
-        .upload-btn {
-            background: #38bdf8;
-            color: #0f172a;
-            border: none;
-            padding: 0.75rem 1.5rem;
-            font-weight: bold;
-            border-radius: 6px;
-            margin-top: 1rem;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-
-        .upload-btn:hover {
-            background: #0ea5e9;
-        }
-
-        /* Results / Analysis Panel */
-        .results-panel {
-            background: rgba(15, 23, 42, 0.5);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 12px;
-            padding: 1.5rem;
-            min-height: 200px;
-            text-align: left;
-        }
-
-        .results-panel h2 {
-            font-size: 1.1rem;
-            color: #34d399;
-            margin-bottom: 1rem;
-            text-transform: uppercase;
-        }
-
-        .placeholder-text {
-            color: #64748b;
-            font-style: italic;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: #f8fafc; min-height: 100vh; display: flex; flex-direction: column; }
+        header { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(56, 189, 248, 0.1); padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+        header h1 { font-size: 1.2rem; letter-spacing: 0.05em; text-transform: uppercase; color: #38bdf8; }
+        .user-badge { background: rgba(56, 189, 248, 0.1); border: 1px solid #38bdf8; padding: 0.4rem 1rem; border-radius: 20px; font-size: 0.85rem; color: #38bdf8; }
+        .hub-link { color: #94a3b8; font-size: 0.85rem; text-decoration: none; }
+        .hub-link:hover { color: #38bdf8; }
+        main { flex: 1; padding: 2rem; max-width: 1200px; width: 100%; margin: 0 auto; }
+        .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
+        .metric-card { background: rgba(30, 41, 59, 0.5); border: 1px solid rgba(255, 255, 255, 0.05); padding: 1.5rem; border-radius: 12px; }
+        .metric-card h3 { font-size: 0.85rem; text-transform: uppercase; color: #94a3b8; margin-bottom: 0.5rem; }
+        .metric-card p { font-size: 1.8rem; font-weight: bold; color: #f8fafc; }
+        .workspace-box { background: rgba(30, 41, 59, 0.3); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 16px; padding: 2.5rem; text-align: center; margin-bottom: 2rem; }
+        .upload-zone { border: 2px dashed rgba(56, 189, 248, 0.3); border-radius: 12px; padding: 3rem 2rem; cursor: pointer; transition: all 0.3s ease; }
+        .upload-zone:hover, .upload-zone.is-dragging { border-color: #38bdf8; background: rgba(56, 189, 248, 0.06); }
+        .upload-icon { font-size: 2.5rem; color: #38bdf8; margin-bottom: 1rem; }
+        .upload-btn { background: #38bdf8; color: #0f172a; border: none; padding: 0.75rem 1.5rem; font-weight: bold; border-radius: 6px; margin-top: 1rem; cursor: pointer; transition: background 0.2s; }
+        .upload-btn:hover { background: #0ea5e9; }
+        .upload-btn.secondary { background: transparent; border: 1px solid #475569; color: #f8fafc; }
+        .upload-btn:disabled { cursor: not-allowed; opacity: .55; }
+        .status { min-height: 1.5rem; margin-top: 1rem; color: #94a3b8; }
+        .status.success { color: #34d399; } .status.error { color: #fb7185; }
+        .results-panel { background: rgba(15, 23, 42, 0.5); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 12px; padding: 1.5rem; min-height: 200px; text-align: left; }
+        .results-panel h2 { font-size: 1.1rem; color: #34d399; margin-bottom: 1rem; text-transform: uppercase; }
+        .placeholder-text { color: #64748b; font-style: italic; }
+        .hidden { display: none; }
+        .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: .75rem; margin: 1rem 0 1.5rem; }
+        .metric { background: rgba(30, 41, 59, .8); border: 1px solid #334155; border-radius: 8px; padding: 1rem; }
+        .metric dt { color: #94a3b8; font-size: .8rem; text-transform: uppercase; } .metric dd { margin: .35rem 0 0; font-size: 1.5rem; font-weight: 700; }
+        .analysis-section { margin-top: 1.5rem; } .analysis-section h3 { font-size: 1rem; margin-bottom: .75rem; }
+        .table-wrap { overflow-x: auto; border: 1px solid #334155; border-radius: 8px; }
+        table { width: 100%; border-collapse: collapse; min-width: 540px; } th, td { padding: .65rem .75rem; border-bottom: 1px solid #334155; text-align: left; white-space: nowrap; } th { color: #38bdf8; background: rgba(30, 41, 59, .9); font-size: .85rem; } td { color: #dbeafe; font-size: .9rem; } tr:last-child td { border-bottom: 0; }
+        .workspace-actions { display: flex; justify-content: flex-end; gap: .75rem; }
+        @media (max-width: 600px) { header { padding: 1rem; } main { padding: 1rem; } .workspace-box { padding: 1rem; } }
     </style>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.5.4/papaparse.min.js"></script>
+    <link rel="stylesheet" href="static/css/mr-analytics.css">
 </head>
-<body>
-
+<body class="ma-app">
     <header>
         <h1>M&R Research Analytics Hub</h1>
-        <div class="user-badge">Verified Researcher</div>
+        <div>
+            <a class="hub-link" href="platform.html">Back to Platform Hub</a>
+            <span class="user-badge">Verified Researcher</span>
+        </div>
     </header>
-
     <main>
-        <!-- Top Metrics overview -->
         <div class="metrics-grid">
-            <div class="metric-card">
-                <h3>Datasets Analyzed</h3>
-                <p>0</p>
-            </div>
-            <div class="metric-card">
-                <h3>Total Rows Processed</h3>
-                <p>0</p>
-            </div>
-            <div class="metric-card">
-                <h3>System Status</h3>
-                <p style="color: #34d399;">Ready</p>
-            </div>
-        </div>
-<!-- Chart Container -->
-<div style="position: relative; width: 100%; max-width: 650px; margin: 20px auto;">
-  <canvas id="myAnalyticsChart"></canvas>
-</div>
-        <!-- Main file analysis upload core -->
-        <div class="workspace-box">
-            <div class="upload-zone">
-                <div class="upload-icon">⎋</div>
-                <h3>Drag & Drop Raw Research Data</h3>
-                <p style="color: #64748b; margin-top: 0.5rem; font-size: 0.9rem;">Supports CSV, TSV, or Excel files</p>
-                <button class="upload-btn" id="browseBtn">Browse Local Files</button>
-                <input type="file" id="csvFileInput" accept=".csv" style="display: none;">
-            <button type="button" id="processCsvBtn" class="upload-btn" style="margin-top: 15px; background-color: #2563eb;">
-    Upload & Process CSV
-           </button>
+            <div class="metric-card"><h3>Datasets Analyzed</h3><p id="datasetsAnalyzed">0</p></div>
+            <div class="metric-card"><h3>Total Rows Processed</h3><p id="rowsProcessed">0</p></div>
+            <div class="metric-card"><h3>System Status</h3><p id="systemStatus" style="color: #34d399;">Ready</p></div>
         </div>
 
-        <!-- Section where results will compile live -->
-        <div class="results-panel">
+        <div class="workspace-box" aria-labelledby="workspace-heading">
+            <div class="upload-zone" id="uploadZone" tabindex="0" role="button" aria-describedby="uploadHelp">
+                <div class="upload-icon" aria-hidden="true">+</div>
+                <h3 id="workspace-heading">Data Analyst Workspace</h3>
+                <p id="uploadHelp" style="color: #64748b; margin-top: 0.5rem; font-size: 0.9rem;">Drop a CSV file here or browse local files. Maximum 10 MB, 100,000 rows, and 100 columns.</p>
+                <button class="upload-btn" id="browseButton" type="button">Browse Local Files</button>
+                <input type="file" id="csvFileInput" accept=".csv,text/csv" hidden>
+            </div>
+            <p class="status" id="statusMessage" role="status" aria-live="polite">No active data stream detected.</p>
+            <div class="workspace-actions">
+                <button type="button" id="processCsvBtn" class="upload-btn" disabled>Upload &amp; Process CSV</button>
+                <button type="button" id="removeDatasetBtn" class="upload-btn secondary hidden">Remove Dataset</button>
+            </div>
+        </div>
+
+        <div class="results-panel" id="resultsPanel">
             <h2>Analysis Output Terminal</h2>
-            <p class="placeholder-text">No active data stream detected. Upload a dataset above to trigger background Python calculations...</p>
+            <p class="placeholder-text" id="resultsPlaceholder">Upload a CSV dataset above to analyze it inside this workspace.</p>
+            <div id="analysisContent" class="hidden">
+                <div class="summary-grid" id="summaryGrid"></div>
+                <div class="analysis-section"><h3>Schema</h3><div class="table-wrap"><table id="schemaTable"></table></div></div>
+                <div class="analysis-section"><h3>Numeric Descriptive Statistics</h3><div class="table-wrap"><table id="statsTable"></table></div></div>
+                <div class="analysis-section"><h3>Data Preview (First 100 Rows)</h3><div class="table-wrap"><table id="previewTable"></table></div></div>
+            </div>
         </div>
     </main>
-    <!-- Script tag containing our logic -->
-     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-    // Handle file selection and drag-and-drop
-// Grab HTML elements
-const browseBtn = document.getElementById('browseBtn');
-const fileInput = document.getElementById('csvFileInput');
-const processBtn = document.getElementById('processCsvBtn');
-const dropZone = document.querySelector('.upload-zone');
-browseBtn.onclick = () => {
-    fileInput.click();
-};
-let selectedFile = null;
+        const MAX_FILE_BYTES = 10 * 1024 * 1024;
+        const allowedTypes = ["text/csv", "application/csv", "application/vnd.ms-excel", "application/octet-stream", "text/plain"];
+        const fileInput = document.getElementById("csvFileInput");
+        const browseButton = document.getElementById("browseButton");
+        const uploadZone = document.getElementById("uploadZone");
+        const processButton = document.getElementById("processCsvBtn");
+        const removeButton = document.getElementById("removeDatasetBtn");
+        const statusMessage = document.getElementById("statusMessage");
+        const analysisContent = document.getElementById("analysisContent");
+        const resultsPlaceholder = document.getElementById("resultsPlaceholder");
+        let selectedFile = null;
 
-    fileInput.addEventListener('change', (e) => {
-        if (e.target.files.length > 0) {
-            selectedFile = e.target.files[0];
-            browseBtn.textContent = `Selected: ${selectedFile.name}`;
-            browseBtn.style.backgroundColor = '#10b981';
-        }
-    });
-
-// Send file to Flask when "Upload & Process CSV" is clicked
-if (processBtn) {
-    processBtn.addEventListener('click', () => {
-        if (!selectedFile) {
-            alert("Please select a CSV file first!");
-            return;
+        function setState(state, message) {
+            statusMessage.className = `status ${state === "success" ? "success" : state === "error" ? "error" : ""}`;
+            statusMessage.textContent = message;
+            processButton.disabled = !selectedFile || ["validating", "processing"].includes(state);
+            removeButton.classList.toggle("hidden", !selectedFile);
+            processButton.textContent = state === "processing" ? "Processing..." : "Upload & Process CSV";
+            document.getElementById("systemStatus").textContent = state === "processing" ? "Processing" : state === "error" ? "Needs attention" : "Ready";
         }
 
-        const formData = new FormData();
-        formData.append('file', selectedFile);
+        function validateFile(file) {
+            if (!file) throw new Error("Please choose a CSV file.");
+            if (!file.name || file.name.includes("\0") || file.name.trim() !== file.name) throw new Error("The filename is invalid.");
+            if (!file.name.toLowerCase().endsWith(".csv")) throw new Error("Only CSV files are supported.");
+            if (file.size === 0) throw new Error("The selected file is empty.");
+            if (file.size > MAX_FILE_BYTES) throw new Error("The CSV file is too large. Maximum size is 10 MB.");
+            if (file.type && !allowedTypes.includes(file.type)) throw new Error("The selected file is not a CSV.");
+        }
 
-        processBtn.textContent = "Processing...";
-
-        fetch('/upload', {
-            method: 'POST',
-            body: formData
-        })
-        .then(response => {
-            if (!response.ok) throw new Error(`Server error: ${response.status}`);
-            return response.json();
-        })
-        .then(data => {
-            console.log("Data from Flask:", data);
-            processBtn.textContent = "Upload & Process CSV";
-            if (typeof handleCSV === 'function') {
-                handleCSV(selectedFile);
+        function selectFile(file) {
+            setState("validating", "Validating file...");
+            try {
+                validateFile(file);
+                selectedFile = file;
+                browseButton.textContent = `Selected: ${file.name}`;
+                setState("selected", "File selected. Ready to process.");
+            } catch (error) {
+                selectedFile = null;
+                browseButton.textContent = "Browse Local Files";
+                setState("error", error.message);
             }
-        })
-        .catch(error => {
-            console.error("Error connecting to server:", error);
-            alert("Could not reach Flask backend. Check terminal!");
-            processBtn.textContent = "Upload & Process CSV";
+        }
+
+        browseButton.addEventListener("click", (event) => { event.stopPropagation(); fileInput.click(); });
+        uploadZone.addEventListener("click", () => fileInput.click());
+        uploadZone.addEventListener("keydown", (event) => { if (event.key === "Enter" || event.key === " ") fileInput.click(); });
+        fileInput.addEventListener("change", () => selectFile(fileInput.files[0]));
+        uploadZone.addEventListener("dragover", (event) => { event.preventDefault(); uploadZone.classList.add("is-dragging"); });
+        uploadZone.addEventListener("dragleave", () => uploadZone.classList.remove("is-dragging"));
+        uploadZone.addEventListener("drop", (event) => { event.preventDefault(); uploadZone.classList.remove("is-dragging"); selectFile(event.dataTransfer.files[0]); });
+
+        function addCell(row, value, header = false) {
+            const cell = document.createElement(header ? "th" : "td");
+            cell.textContent = value === null || value === undefined ? "" : String(value);
+            row.appendChild(cell);
+        }
+        function renderTable(table, headers, rows) {
+            table.replaceChildren();
+            const head = table.createTHead().insertRow();
+            headers.forEach((header) => addCell(head, header, true));
+            const body = table.createTBody();
+            rows.forEach((values) => { const row = body.insertRow(); values.forEach((value) => addCell(row, value)); });
+        }
+        function renderAnalysis(analysis) {
+            const metrics = [["Rows", analysis.rows], ["Columns", analysis.columns], ["Duplicate rows", analysis.duplicate_rows], ["Preview rows", analysis.preview.length]];
+            const summaryGrid = document.getElementById("summaryGrid");
+            summaryGrid.replaceChildren();
+            metrics.forEach(([label, value]) => { const metric = document.createElement("dl"); metric.className = "metric"; const term = document.createElement("dt"); term.textContent = label; const detail = document.createElement("dd"); detail.textContent = value; metric.append(term, detail); summaryGrid.appendChild(metric); });
+            renderTable(document.getElementById("schemaTable"), ["Column", "Detected type", "Missing values"], analysis.column_names.map((column) => [column, analysis.column_types[column], analysis.missing_values[column]]));
+            const statColumns = Object.keys(analysis.numeric_statistics);
+            renderTable(document.getElementById("statsTable"), ["Statistic", ...statColumns], ["count", "mean", "std", "min", "25%", "50%", "75%", "max"].map((stat) => [stat, ...statColumns.map((column) => analysis.numeric_statistics[column][stat])]));
+            renderTable(document.getElementById("previewTable"), analysis.column_names, analysis.preview.map((row) => analysis.column_names.map((column) => row[column])));
+            analysisContent.classList.remove("hidden");
+            resultsPlaceholder.classList.add("hidden");
+            document.getElementById("datasetsAnalyzed").textContent = "1";
+            document.getElementById("rowsProcessed").textContent = analysis.rows;
+        }
+
+        processButton.addEventListener("click", async () => {
+            if (!selectedFile) return setState("error", "Please select a CSV file first.");
+            setState("processing", "Uploading and analyzing CSV...");
+            try {
+                const formData = new FormData();
+                formData.append("file", selectedFile);
+                const response = await fetch("/upload", { method: "POST", body: formData });
+                const payload = await response.json();
+                if (!response.ok || payload.status !== "success") throw new Error(payload.message || "The CSV could not be processed.");
+                renderAnalysis(payload.analysis);
+                setState("success", `Analysis complete: ${payload.analysis.filename}`);
+            } catch (error) {
+                setState("error", error.message || "Could not reach the Flask backend.");
+            }
         });
-    });
-}
-    dropZone.addEventListener('click', () => fileInput.click());
 
-    // Highlight border on drag over
-    dropZone.addEventListener('dragover', (e) => {
-        e.preventDefault();
-        dropZone.style.border = '2px dashed #00f2fe';
-    });
-
-    dropZone.addEventListener('dragleave', () => {
-        dropZone.style.border = '';
-    });
-
-    // Handle dropped file
-    dropZone.addEventListener('drop', (e) => {
-        e.preventDefault();
-        dropZone.style.border = '';
-        const files = e.dataTransfer.files;
-        if (files.length) handleCSV(files[0]);
-    });
-
-// Handle file selection from explorer
-fileInput.addEventListener('change', (e) => {
-    console.log('FILE CHANGE DETECTED');
-
-    if (e.target.files.length) {
-        console.log('FILE SELECTED:', e.target.files[0].name);
-        handleCSV(e.target.files[0]);
-    } else {
-        console.log('NO FILE SELECTED');
-    }
-});
-
-// Global dataset holder
-let currentDataset = null;
-
-// Parse the file using our PapaParse library
-function handleCSV(file) {
-    const terminal = document.querySelector('.results-panel p');
-    if (terminal) {
-        terminal.textContent = 'Processing and parsing dataset...';
-    }
-
-    Papa.parse(file, {
-        header: true,
-        dynamicTyping: true,
-        skipEmptyLines: true,
-        complete: function(results) {
-            currentDataset = results.data;
-            displayMetrics(results.data, file.name);
-            // Automatically draw a chart using the first two columns!
-            const cols = Object.keys(results.data[0] || {});
-            if (cols.length >= 2) {
-                drawChart(results.data, cols[0], cols[1], 'bar');
-            }
-        }
-    });
-}
-// Update the output terminal with calculations
-function displayMetrics(data, fileName) {
-    const terminal = document.querySelector('.results-panel p');
-    if (terminal) {
-        const totalRows = data.length;
-        const columns = Object.keys(data[0] || {});
-        terminal.style.fontFamily = 'monospace';
-        terminal.style.whiteSpace = 'pre-line';
-        terminal.innerHTML = `
-<span style="color: #4ade80">> SUCCESS: Loaded "${fileName}"</span><br/>
-<span style="color: #60a5fa">> Total Records:</span> ${totalRows}<br/>
-<span style="color: #60a5fa">> Columns Found:</span> [${columns.join(', ')}]<br/>
-<span style="color: #c084fc">> Summary:</span> Data successfully compiled in local memory!
- `;
-    }
-}
-// --- CHART RENDERING LOGIC ---
-let chartInstance = null;
-
-function drawChart(parsedCsvData, xAxisKey, yAxisKey, type = 'bar') {
-  const labels = parsedCsvData.map(row => row[xAxisKey]);
-  const dataPoints = parsedCsvData.map(row => Number(row[yAxisKey]) || 0);
-
-  const ctx = document.getElementById('myAnalyticsChart').getContext('2d');
-
-  if (chartInstance) {
-    chartInstance.destroy();
-  }
-
-  chartInstance = new Chart(ctx, {
-    type: type,
-    data: {
-      labels: labels,
-      datasets: [{
-        label: `${yAxisKey} vs ${xAxisKey}`,
-        data: dataPoints,
-        backgroundColor: 'rgba(54, 162, 235, 0.5)',
-        borderColor: 'rgba(54, 162, 235, 1)',
-        borderWidth: 2
-      }]
-    },
-    options: {
-      responsive: true
-    }
-  });
-}
-
-// Temporary test call
-drawChart([
-  { Month: 'Jan', Sales: 100 },
-  { Month: 'Feb', Sales: 250 },
-  { Month: 'Mar', Sales: 180 }
-], 'Month', 'Sales', 'bar');
+        removeButton.addEventListener("click", () => {
+            selectedFile = null;
+            fileInput.value = "";
+            browseButton.textContent = "Browse Local Files";
+            analysisContent.classList.add("hidden");
+            resultsPlaceholder.classList.remove("hidden");
+            document.getElementById("summaryGrid").replaceChildren();
+            document.getElementById("datasetsAnalyzed").textContent = "0";
+            document.getElementById("rowsProcessed").textContent = "0";
+            setState("idle", "Dataset removed. Ready for another CSV.");
+        });
+    </script>
+</body>
+</html>

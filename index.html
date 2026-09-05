@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My First Dev Project</title>
+    <title>Mr. Analytics</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -11,8 +11,7 @@
             color: #f8fafc;
             display: flex;
             justify-content: center;
-            align-items: center;
-            height: 100vh;
+            min-height: 100vh;
             margin: 0;
         }
         .container 
@@ -43,6 +42,18 @@ margin: 0 auto;
     font-weight: bold;
     transition: background-color 0.3s ease; /* Smooth transition animation */
 }
+.login-button {
+    margin-top: 1rem;
+    background-color: transparent;
+    color: #38bdf8;
+    border: 2px solid #38bdf8;
+    width: auto;
+}
+
+.login-button:hover {
+    background-color: #38bdf8;
+    color: #0f172a;
+}
 .input-field {
     display: block;
     width: 80%;
@@ -69,41 +80,57 @@ margin: 0 auto;
     letter-spacing: 0.05em;
 }
 </style>
-<body>
+    <link rel="stylesheet" href="static/css/mr-analytics.css">
+</head>
+<body class="ma-app">
     <div class="container">
+
         <h1>welcome to M&R RESEARCH inc.</h1>
+
         <p>where top analysis still exist in todays world</p>
 
-       <form id="lead-form">
-    <input
-        type="email"
-        id="register-email"
-        placeholder="Enter your email address"
-        class="input-field"
-        required
-    >
+        <form id="lead-form">
 
-    <input
-        type="password"
-        id="register-password"
-        placeholder="Create a password"
-        class="input-field"
-        required
-        minlength="6"
-    >
+            <input
+                type="email"
+                id="register-email"
+                placeholder="Enter your email address"
+                class="input-field"
+                required
+            >
 
-    <button
-        type="submit"
-        class="button-link"
-        style="border: none; cursor: pointer; width: auto;"
-    >
-        REGISTER
-    </button>
-</form>
-        <p id="success-msg" class="success-text" style="display: none;">Thank you! Your analysis is preparing...</p>
-    </div><div style="position: relative; width: 100%; max-width: 600px; margin: 20px auto;">
-  <canvas id="myAnalyticsChart"></canvas>
-</div>
+            <input
+                type="password"
+                id="register-password"
+                placeholder="Create a password"
+                class="input-field"
+                required
+                minlength="6"
+            >
+
+            <button
+                type="submit"
+                class="button-link"
+                style="border: none; cursor: pointer; width: auto;"
+            >
+                REGISTER
+            </button>
+
+        </form>
+
+        <a href="/login.html" class="button-link login-button">
+            LOGIN
+        </a>
+
+        <p id="success-msg" class="success-text" style="display: none;">
+            Thank you! Your analysis is preparing...
+        </p>
+
+        <div style="position: relative; width: 100%; max-width: 600px; margin: 20px auto;">
+            <canvas id="myAnalyticsChart"></canvas>
+        </div>
+
+    </div>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>

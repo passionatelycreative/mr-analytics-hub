@@ -3,257 +3,70 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>M&R Analytics | Online Banking</title>
-
+    <title>Online Banking | M&R Analytics</title>
+    <link rel="stylesheet" href="static/css/mr-analytics.css">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
-                         Roboto, sans-serif;
-        }
-
-        body {
-            min-height: 100vh;
-            background: linear-gradient(135deg, #0f172a, #1e293b);
-            color: #f8fafc;
-        }
-
-        header {
-            padding: 1.5rem 2rem;
-            border-bottom: 1px solid rgba(255,255,255,0.08);
-            background: rgba(15,23,42,0.8);
-        }
-
-        header h1 {
-            color: #38bdf8;
-            font-size: 1.3rem;
-            letter-spacing: 0.05em;
-        }
-
-        main {
-            max-width: 1200px;
-            margin: auto;
-            padding: 3rem 2rem;
-        }
-
-        .welcome {
-            margin-bottom: 2.5rem;
-        }
-
-        .welcome h2 {
-            font-size: 2.3rem;
-            margin-bottom: 0.7rem;
-        }
-
-        .welcome p {
-            color: #94a3b8;
-        }
-
-        .balance-card {
-            background: linear-gradient(135deg, #0369a1, #0f766e);
-            border-radius: 18px;
-            padding: 2rem;
-            margin-bottom: 2rem;
-        }
-
-        .balance-card h3 {
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            opacity: 0.8;
-        }
-
-        .balance {
-            font-size: 2.8rem;
-            font-weight: 700;
-            margin-top: 0.5rem;
-        }
-
-        .bank-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 1.5rem;
-        }
-
-        .bank-card {
-            background: rgba(30,41,59,0.65);
-            border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 16px;
-            padding: 2rem;
-        }
-
-        .bank-card h3 {
-            margin-bottom: 0.7rem;
-        }
-
-        .bank-card p {
-            color: #94a3b8;
-            line-height: 1.6;
-        }
-
-        .bank-btn {
-            display: inline-block;
-            margin-top: 1.5rem;
-            padding: 0.7rem 1.1rem;
-            border-radius: 7px;
-            background: #38bdf8;
-            color: #0f172a;
-            text-decoration: none;
-            font-weight: 700;
-        }
-
-        .back-btn {
-            display: inline-block;
-            margin-top: 2.5rem;
-            color: #94a3b8;
-            text-decoration: none;
-        }
-
-        @media (max-width: 800px) {
-            .bank-grid {
-                grid-template-columns: 1fr;
-            }
-        }
+        .bank-summary { margin-top: 2rem; padding: 1.5rem; border: 1px solid var(--ma-border); border-radius: var(--ma-radius); background: var(--ma-surface); box-shadow: var(--ma-shadow); }
+        .bank-summary h2 { margin: 0; font-size: 1rem; color: var(--ma-muted); text-transform: uppercase; }
+        .balance { margin: .55rem 0 0; font-size: clamp(2rem, 5vw, 3.4rem); font-weight: 750; }
+        .bank-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(215px, 1fr)); gap: 1rem; margin-top: 1.5rem; }
+        .bank-card { padding: 1.25rem; border: 1px solid var(--ma-border); border-radius: var(--ma-radius); background: var(--ma-surface); box-shadow: var(--ma-shadow); }
+        .bank-card h2 { margin: 0; font-size: 1.1rem; }
+        .bank-card p { color: var(--ma-muted); line-height: 1.6; }
+        .account-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-top: 1.5rem; }
+        .account-value { margin: .35rem 0 0; font-size: 1.35rem; font-weight: 700; }
     </style>
 </head>
-
-<body>
-
-    <header>
-        <h1>M&R ANALYTICS</h1>
-    </header>
-
-    <main>
-
-        <section class="welcome">
-            <h2>Online Banking</h2>
-            <p>
-                Manage your financial activity, portfolio and digital assets.
-            </p>
+<body class="ma-app">
+    <header class="ma-header"><div class="ma-shell ma-header-inner"><a class="ma-brand" href="platform.html">M&R <span>Analytics</span></a><nav class="ma-nav" aria-label="Primary"><a href="platform.html">Platform Hub</a><a href="crypto.html">Crypto Analytics</a><a href="customer-care.html">Customer Care</a></nav></div></header>
+    <main class="ma-shell ma-page">
+        <p class="ma-eyebrow">Online Banking</p>
+        <h1 class="ma-page-title">Banking Overview</h1>
+        <p class="ma-page-copy">Manage account information and banking operations from one dedicated workspace.</p>
+        <section class="bank-summary" aria-labelledby="balance-heading"><h2 id="balance-heading">Available Balance</h2><p class="balance" id="totalBalance">$0.00</p></section>
+        <section class="account-grid" aria-label="Account summary">
+            <article class="bank-card"><h2>Available Cash</h2><p class="account-value">$0.00</p></article>
+            <article class="bank-card"><h2>Investments</h2><p class="account-value">$0.00</p></article>
+            <article class="bank-card"><h2>Account BTC Balance</h2><p class="account-value" id="cryptoBalance">0.0000 BTC</p></article>
         </section>
-
-        <section class="balance-card">
-            <h3>Available Balance</h3>
-            <div class="balance">$0.00</div>
+        <section class="bank-grid" aria-label="Banking actions">
+            <article class="bank-card"><h2>Deposit Funds</h2><p>View future funding instructions and deposit activity.</p><a class="ma-button" href="deposit.html">Open Deposits</a></article>
+            <article class="bank-card"><h2>Withdraw Funds</h2><p>View future withdrawal requests and their processing status.</p><a class="ma-button" href="withdrawal.html">Open Withdrawals</a></article>
+            <article class="bank-card"><h2>Transfer Funds</h2><p>View future account transfers and transfer history.</p><a class="ma-button" href="transfer.html">Open Transfers</a></article>
+            <article class="bank-card"><h2>Transactions</h2><p>Review account activity when transaction history is available.</p><a class="ma-button" href="transactions.html">View Transactions</a></article>
+            <article class="bank-card"><h2>Portfolio</h2><p>Review investment positions when portfolio services are available.</p><a class="ma-button" href="portfolio.html">View Portfolio</a></article>
+            <article class="bank-card"><h2>Accounts</h2><p>Manage future account products and account settings.</p><a class="ma-button" href="accounts.html">Open Accounts</a></article>
+            <article class="bank-card"><h2>Crypto Analytics</h2><p>Explore live market intelligence in its separate analytics workspace.</p><a class="ma-button ma-button-secondary" href="crypto.html">Open Crypto Analytics</a></article>
+            <article class="bank-card"><h2>Customer Care</h2><p>Access future support conversations and assistance.</p><a class="ma-button ma-button-secondary" href="customer-care.html">Open Customer Care</a></article>
         </section>
-
-        <section class="bank-grid">
-
-            <div class="bank-card">
-                <h3>💳 Transactions</h3>
-                <p>
-                    View and manage your financial transactions.
-                </p>
-                <a href="#" class="bank-btn">View Transactions</a>
-            </div>
-
-            <div class="bank-card">
-                <h3>📈 Portfolio</h3>
-                <p>
-                    Monitor your investments and portfolio performance.
-                </p>
-                <a href="#" class="bank-btn">View Portfolio</a>
-            </div>
-
-            <div class="bank-card">
-                <h3>₿ Crypto</h3>
-                <p>
-                    Explore cryptocurrency markets, holdings and
-                    market intelligence.
-                </p>
-                <a href="banking.html" class="bank-btn">Open Crypto</a>
-            </div>
-
-        </section>
-
-       
     </main>
-    <section class="bank-overview">
-    <div class="bank-card">
-        <h3>Total Balance</h3>
-        <p id="totalBalance">$0.00</p>
-    </div>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        const SUPABASE_URL = "https://hlxlchoslbejmivwrgzi.supabase.co";
+        const SUPABASE_ANON_KEY = "sb_publishable_tDWf8vEEhHs8QIcBpxajfg_rL0D-WI2";
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    <div class="bank-card">
-        <h3>Available Cash</h3>
-        <p>$0.00</p>
-    </div>
-
-    <div class="bank-card">
-        <h3>Investments</h3>
-        <p>$0.00</p>
-    </div>
-
-    <div class="bank-card">
-        <h3>Crypto Portfolio</h3>
-        <p id="cryptoBalance">$0.00</p>
-    </div>
-</section>
-
-</body>
-</html><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-<script>
-const SUPABASE_URL = "https://hlxlchoslbejmivwrgzi.supabase.co";
-const SUPABASE_ANON_KEY = "sb_publishable_tDWf8vEEhHs8QIcBpxajfg_rL0D-WI2";
-
-const supabaseClient = window.supabase.createClient(
-    SUPABASE_URL,
-    SUPABASE_ANON_KEY
-);
-</script>
-<script>
-async function loadAccount() {
-    try {
-        const {
-            data: { session },
-            error: sessionError
-        } = await supabaseClient.auth.getSession();
-
-        if (sessionError) {
-            throw sessionError;
-        }
-
-        if (!session) {
-            console.error("No authenticated user found.");
-            window.location.href = "/login.html";
-            return;
-        }
-
-        const response = await fetch('/api/account', {
-            headers: {
-                'Authorization': `Bearer ${session.access_token}`
+        async function loadAccount() {
+            try {
+                const { data: { session }, error: sessionError } = await supabaseClient.auth.getSession();
+                if (sessionError) throw sessionError;
+                if (!session) {
+                    window.location.href = "/login.html";
+                    return;
+                }
+                const response = await fetch("/api/account", { headers: { "Authorization": `Bearer ${session.access_token}` } });
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || "Could not load account");
+                }
+                const account = (await response.json()).account;
+                document.getElementById("totalBalance").textContent = `$${Number(account.fiat_balance_usd).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+                document.getElementById("cryptoBalance").textContent = `${Number(account.btc_balance).toFixed(4)} BTC`;
+            } catch (error) {
+                console.error("Account loading error:", error);
             }
-        });
-
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.message || 'Could not load account');
         }
-
-        const data = await response.json();
-        const account = data.account;
-
-        document.getElementById('totalBalance').textContent =
-            `$${Number(account.fiat_balance_usd).toLocaleString(undefined, {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2
-            })}`;
-
-        document.getElementById('cryptoBalance').textContent =
-            `${Number(account.btc_balance).toFixed(4)} BTC`;
-
-        console.log("Account loaded:", account);
-
-    } catch (error) {
-        console.error('Account loading error:', error);
-    }
-}
-
-loadAccount();
-</script>
- <a href="platform.html" class="back-btn">
-            ← Back to Platform Hub
-        </a>
-</script>
+        loadAccount();
+    </script>
+</body>
+</html>
