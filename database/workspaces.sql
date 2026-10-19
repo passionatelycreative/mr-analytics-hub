@@ -60,6 +60,9 @@ COMMENT ON TABLE public.workspace_messages IS 'mr_analytics_private_workspaces_s
 CREATE INDEX IF NOT EXISTS workspace_messages_owner_workspace_idx
     ON public.workspace_messages (owner_id, workspace_id, created_at);
 
+CREATE INDEX IF NOT EXISTS workspace_messages_workspace_owner_idx
+    ON public.workspace_messages (workspace_id, owner_id);
+
 -- A per-account transaction lock prevents parallel uploads or saves exceeding
 -- the quota. Limits reject the new write; saved datasets are never evicted.
 -- SECURITY INVOKER preserves RLS and does not grant elevated data access.
@@ -152,14 +155,20 @@ ALTER TABLE public.workspace_messages FORCE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS mr_analytics_own_workspaces ON public.workspaces;
 CREATE POLICY mr_analytics_own_workspaces ON public.workspaces
     FOR ALL TO authenticated
-    USING ((SELECT auth.uid()) = owner_id)
-    WITH CHECK ((SELECT auth.uid()) = owner_id);
+    USING ((SELECT auth.uid()) = owner_id AND (((SELECT auth.jwt())->>'is_anonymous')::boolean IS FALSE))
+    WITH CHECK ((SELECT auth.uid()) = owner_id AND (((SELECT auth.jwt())->>'is_anonymous')::boolean IS FALSE));
 
 DROP POLICY IF EXISTS mr_analytics_own_messages ON public.workspace_messages;
 CREATE POLICY mr_analytics_own_messages ON public.workspace_messages
     FOR ALL TO authenticated
-    USING ((SELECT auth.uid()) = owner_id)
-    WITH CHECK ((SELECT auth.uid()) = owner_id);
+    USING ((SELECT auth.uid()) = owner_id AND (((SELECT auth.jwt())->>'is_anonymous')::boolean IS FALSE))
+    WITH CHECK ((SELECT auth.uid()) = owner_id AND (((SELECT auth.jwt())->>'is_anonymous')::boolean IS FALSE));
+
+-- Supabase anonymous sign-ins also use the authenticated role. Durable
+-- customer workspaces require a permanent account; guest reports stay local.
+-- Keep reruns compatible with the earlier two-policy setup.
+DROP POLICY IF EXISTS mr_analytics_permanent_workspaces ON public.workspaces;
+DROP POLICY IF EXISTS mr_analytics_permanent_messages ON public.workspace_messages;
 
 REVOKE ALL ON public.workspaces, public.workspace_messages FROM PUBLIC, anon, authenticated;
 GRANT SELECT, INSERT, UPDATE, DELETE ON public.workspaces TO authenticated;

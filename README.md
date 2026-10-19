@@ -35,7 +35,7 @@ month,region,revenue,orders
 
 Use the same Supabase project that holds existing customer accounts. Configure the server's `SUPABASE_URL` and `SUPABASE_KEY` values from that project's API settings; `SUPABASE_KEY` must be the project's public anon/publishable key. Keep real configuration in `.env` locally or the hosting provider's environment settings. No service-role key is needed: requests use each signed-in customer's access token, and row-level security restricts workspace access to that customer.
 
-Run [database/workspaces.sql](database/workspaces.sql) in the Supabase SQL editor before deploying this feature. The migration creates only the analytics workspace resources and their ownership policies. It does not copy expired guest reports into accounts. If the project or migration is missing, account features show an unavailable message; the app never labels a local temporary report as saved to an account.
+Run [database/workspaces.sql](database/workspaces.sql) in the Supabase SQL editor before deploying this feature. The migration creates only the analytics workspace resources and their ownership policies. Durable workspaces require a permanent account; Supabase anonymous sign-ins cannot access these tables. It does not copy expired guest reports into accounts. If the project or migration is missing, account features show an unavailable message; the app never labels a local temporary report as saved to an account.
 
 To check the complete customer workflow:
 
