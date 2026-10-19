@@ -72,7 +72,7 @@ function report() {
   };
 }
 
-async function workspace({ mode = "analysis", stored = null, enabled = true, failUpload = false, failQuestion = false } = {}) {
+async function workspace({ mode = "analysis", stored = null, enabled = true, failUpload = false, failQuestion = false, persistent = false, failSave = false, saveGate = null, uploadGate = null, viewGate = null, promotionGate = null, guestReport = false, search = "" } = {}) {
   const elements = new Map();
   const get = (id) => {
     if (!elements.has(id)) elements.set(id, new Element(id === "chart-column" ? "select" : "div"));
@@ -84,15 +84,47 @@ async function workspace({ mode = "analysis", stored = null, enabled = true, fai
   prompts[0].dataset.question = "What needs cleaning?";
   get("report").hidden = true;
   const dataset = report();
+  let saved = { id: "11111111-1111-4111-8111-111111111111", title: "Saved research", filename: "research.csv", analysis: dataset, notes: "Prior research notes", state: { chart_column: "score", active_section: mode }, revision: 3, has_original_csv: true, messages: [{ question: "A prior question", answer: "A saved answer" }] };
+  const savedById = new Map([[saved.id, saved]]);
+  let uploads = 0;
   const respond = (payload, ok = true) => ({ ok, json: async () => payload });
   const fetch = async (url, options = {}) => {
     requests.push({ url, options });
     if (url === "/static/samples/research-sample.csv") return { ok: true, text: async () => "category,score\nA,1\nB,2\n" };
-    if (url === "/upload") return failUpload ? respond({ message: "CSV contains inconsistent row lengths." }, false) : respond({ analysis_id: "report-test-123", analysis: dataset });
+    if (url === "/upload") {
+      uploads++;
+      if (uploadGate) await uploadGate;
+      if (failUpload) return respond({ message: "CSV contains inconsistent row lengths." }, false);
+      if (persistent) {
+        saved = { ...saved, id: "22222222-2222-4222-8222-" + String(uploads).padStart(12, "0"), title: "New saved dataset " + uploads, notes: "", state: {}, revision: 1 };
+        savedById.set(saved.id, saved);
+        return respond({ analysis_id: "ws_" + saved.id, analysis: dataset, workspace: saved, persistent: true });
+      }
+      return respond({ analysis_id: "report-test-123", analysis: dataset });
+    }
+    if (url === "/api/workspaces" && options.method === "POST") {
+      if (promotionGate) await promotionGate;
+      saved = { ...saved, id: "33333333-3333-4333-8333-333333333333", revision: 1 };
+      savedById.set(saved.id, saved);
+      return respond({ analysis_id: "ws_" + saved.id, analysis: dataset, workspace: saved, persistent: true });
+    }
+    if (url.startsWith("/api/workspaces/") && options.method === "PATCH") {
+      const { expected_revision, ...changes } = JSON.parse(options.body);
+      const workspaceId = url.split("/").at(-1);
+      if (saveGate && Object.hasOwn(changes, "notes")) await saveGate;
+      if (viewGate && !Object.hasOwn(changes, "notes")) await viewGate;
+      if (failSave && Object.hasOwn(changes, "notes")) return { ok: false, status: 409, json: async () => ({ message: "This workspace changed elsewhere." }) };
+      const original = savedById.get(workspaceId);
+      assert.equal(expected_revision, original.revision);
+      const updated = { ...original, ...changes, revision: original.revision + 1 };
+      savedById.set(workspaceId, updated);
+      if (saved.id === workspaceId) saved = updated;
+      return respond({ workspace: updated });
+    }
     if (url === "/api/ai-status") return respond({ enabled });
     if (url.endsWith("/question")) return failQuestion ? respond({ message: "AI access code is invalid." }, false) : respond({ answer: "<script>untrusted answer</script> Check the missing values first." });
     if (options.method === "DELETE") return respond({ deleted: true });
-    if (url.startsWith("/api/analysis/")) return respond({ analysis: dataset });
+    if (url.startsWith("/api/analysis/")) return respond({ analysis: dataset, ...(persistent && !guestReport ? { workspace: saved, persistent: true } : {}) });
     throw new Error("Unexpected request: " + url);
   };
   const context = {
@@ -103,17 +135,33 @@ async function workspace({ mode = "analysis", stored = null, enabled = true, fai
       createElement: (tag) => new Element(tag),
       createElementNS: (_, tag) => new Element(tag),
     },
-    fetch, FormData, File, Blob, URL, URLSearchParams, setTimeout,
-    location: { search: "" },
+    fetch, FormData, File, Blob, URL, URLSearchParams, setTimeout, clearTimeout,
+    location: { search },
     sessionStorage: {
       getItem: (key) => storage.get(key) ?? null,
       setItem: (key, value) => storage.set(key, value),
       removeItem: (key) => storage.delete(key),
     },
   };
+  if (persistent) {
+    context.window = {
+      addEventListener() {},
+      location: { assign: (url) => navigations.push(url) },
+      MrAccount: {
+        ready: Promise.resolve({ user: { id: "customer-1" }, configured: true }),
+        request: async (url, options) => {
+          const response = await fetch(url, options);
+          const payload = await response.json();
+          if (!response.ok) { const error = new Error(payload.message); error.status = response.status; throw error; }
+          return payload;
+        },
+      },
+    };
+  }
+  const navigations = [];
   vm.runInNewContext(source, context, { filename: "analytics-workspace.js" });
   await settle();
-  return { get, requests, storage, prompts, dataset };
+  return { get, requests, storage, prompts, dataset, window: context.window, navigations };
 }
 
 test("sample upload renders real report values and treats CSV content as text", async () => {
@@ -200,4 +248,138 @@ test("AI access errors are rendered and release the submit button", async () => 
   assert.match(app.get("question-status").className, /error/);
   assert.equal(app.get("answers").children.length, 0);
   assert.equal(app.get("ask-button").disabled, false);
+});
+
+test("a returning customer reopens notes, chart position, and the original download", async () => {
+  const app = await workspace({ persistent: true, stored: "ws_11111111-1111-4111-8111-111111111111" });
+  assert.equal(app.get("workspace-notes").value, "Prior research notes");
+  assert.equal(app.get("workspace-title").value, "Saved research");
+  assert.equal(app.get("chart-column").value, "score");
+  assert.equal(app.get("saved-workspace-controls").hidden, false);
+  assert.match(app.get("download-original").href, /\/download$/);
+  assert.equal(app.get("remove-report").textContent, "Close dataset");
+});
+
+test("notes save with the current revision and closing retains the saved dataset", async () => {
+  const app = await workspace({ persistent: true, stored: "ws_11111111-1111-4111-8111-111111111111" });
+  app.get("workspace-notes").value = "Continue comparing the response groups.";
+  await app.get("workspace-notes").emit("input");
+  assert.equal(await app.window.MrWorkspace.flush(), true);
+  const saved = app.requests.find(({ options }) => options.method === "PATCH" && Object.hasOwn(JSON.parse(options.body), "notes"));
+  assert.equal(JSON.parse(saved.options.body).notes, "Continue comparing the response groups.");
+  assert.equal(JSON.parse(saved.options.body).expected_revision, 4);
+  assert.match(app.get("workspace-save-status").textContent, /All changes saved/);
+  await app.get("remove-report").emit("click");
+  assert.equal(app.get("report").hidden, true);
+  assert.equal(app.requests.some(({ options }) => options.method === "DELETE"), false);
+});
+
+test("uploading another saved dataset never deletes the customer's previous workspace", async () => {
+  const app = await workspace({ persistent: true, stored: "ws_11111111-1111-4111-8111-111111111111" });
+  await app.get("sample-button").emit("click");
+  assert.equal(app.requests.some(({ options }) => options.method === "DELETE"), false);
+  assert.match(app.storage.get("mr-analytics-report"), /^ws_22222222/);
+});
+
+test("an overlapping save keeps the customer's edits and prevents silent loss on close", async () => {
+  const app = await workspace({ persistent: true, failSave: true, stored: "ws_11111111-1111-4111-8111-111111111111" });
+  app.get("workspace-notes").value = "These edits must remain visible.";
+  await app.get("workspace-notes").emit("input");
+  assert.equal(await app.window.MrWorkspace.flush(), false);
+  assert.equal(app.get("workspace-notes").value, "These edits must remain visible.");
+  await app.get("remove-report").emit("click");
+  assert.equal(app.get("report").hidden, false);
+  assert.match(app.get("workspace-save-status").textContent, /edits are still on this page/);
+});
+
+test("navigation waits for an in-flight autosave instead of treating it as already saved", async () => {
+  let release;
+  const gate = new Promise((resolve) => { release = resolve; });
+  const app = await workspace({ persistent: true, saveGate: gate, stored: "ws_11111111-1111-4111-8111-111111111111" });
+  app.get("workspace-notes").value = "A save that is still in flight.";
+  await app.get("workspace-notes").emit("input");
+  const first = app.window.MrWorkspace.flush();
+  const second = app.window.MrWorkspace.flush();
+  assert.equal(first, second);
+  let prevented = false;
+  const navigation = app.get("open-ai").emit("click", { preventDefault() { prevented = true; } });
+  await settle();
+  assert.equal(prevented, true);
+  assert.deepEqual(app.navigations, []);
+  release();
+  assert.equal(await first, true);
+  await navigation;
+  assert.deepEqual(app.navigations, [app.get("open-ai").href]);
+});
+
+test("upload locks old workspace edits and competing actions after saving the previous notes", async () => {
+  let release;
+  const uploadGate = new Promise((resolve) => { release = resolve; });
+  const app = await workspace({ persistent: true, uploadGate, stored: "ws_11111111-1111-4111-8111-111111111111" });
+  app.get("workspace-notes").value = "Keep these notes with the previous dataset.";
+  await app.get("workspace-notes").emit("input");
+  const pending = app.get("sample-button").emit("click");
+  await settle();
+  for (const id of ["workspace-title", "workspace-notes", "chart-column", "save-workspace", "remove-report", "save-to-account"]) assert.equal(app.get(id).disabled, true, id);
+  await app.get("remove-report").emit("click");
+  await app.get("save-to-account").emit("click");
+  assert.equal(app.get("report").hidden, false);
+  const noteRequest = app.requests.find(({ options }) => options.method === "PATCH" && Object.hasOwn(JSON.parse(options.body), "notes"));
+  assert.equal(JSON.parse(noteRequest.options.body).notes, "Keep these notes with the previous dataset.");
+  assert.equal(app.requests.some(({ url }) => url === "/api/workspaces"), false);
+  release(); await pending;
+  assert.equal(app.get("workspace-notes").value, "");
+  assert.equal(app.get("workspace-notes").disabled, false);
+  assert.match(app.storage.get("mr-analytics-report"), /^ws_22222222/);
+});
+
+test("late view updates cannot reopen a closed dataset or replace a newly uploaded workspace", async () => {
+  let releaseClosed;
+  const closedGate = new Promise((resolve) => { releaseClosed = resolve; });
+  const closed = await workspace({ persistent: true, viewGate: closedGate, stored: "ws_11111111-1111-4111-8111-111111111111" });
+  await closed.get("remove-report").emit("click");
+  releaseClosed(); await settle();
+  assert.equal(closed.get("report").hidden, true);
+  assert.equal(closed.get("saved-workspace-controls").hidden, true);
+  assert.equal(closed.storage.has("mr-analytics-report"), false);
+  let releaseOld;
+  const oldGate = new Promise((resolve) => { releaseOld = resolve; });
+  const app = await workspace({ persistent: true, viewGate: oldGate, stored: "ws_11111111-1111-4111-8111-111111111111" });
+  await app.get("sample-button").emit("click");
+  releaseOld(); await settle();
+  app.get("workspace-notes").value = "These notes belong to the new dataset.";
+  await app.get("workspace-notes").emit("input");
+  assert.equal(await app.window.MrWorkspace.flush(), true);
+  const noteRequest = app.requests.find(({ options }) => options.method === "PATCH" && Object.hasOwn(JSON.parse(options.body), "notes"));
+  assert.match(noteRequest.url, /22222222-2222-4222-8222-/);
+  assert.equal(app.get("report-name").textContent, "New saved dataset 1");
+});
+
+test("guest promotion creates one saved workspace and blocks upload and close until complete", async () => {
+  let release;
+  const promotionGate = new Promise((resolve) => { release = resolve; });
+  const app = await workspace({ persistent: true, guestReport: true, promotionGate, stored: "report-test-123" });
+  assert.equal(app.get("save-to-account").hidden, false);
+  const pending = app.get("save-to-account").emit("click");
+  await settle();
+  assert.equal(app.get("save-to-account").disabled, true);
+  await app.get("save-to-account").emit("click");
+  await app.get("sample-button").emit("click");
+  await app.get("remove-report").emit("click");
+  assert.equal(app.requests.filter(({ url }) => url === "/api/workspaces").length, 1);
+  assert.equal(app.requests.some(({ url }) => url === "/upload"), false);
+  assert.equal(app.requests.some(({ options }) => options.method === "DELETE"), false);
+  release(); await pending;
+  assert.match(app.storage.get("mr-analytics-report"), /^ws_33333333/);
+  assert.equal(app.get("saved-workspace-controls").hidden, false);
+  assert.equal(app.get("save-to-account").hidden, true);
+  assert.equal(app.get("csv-file").disabled, false);
+});
+
+test("new analysis starts empty while returning to AI restores saved answers", async () => {
+  const fresh = await workspace({ persistent: true, stored: "ws_11111111-1111-4111-8111-111111111111", search: "?new=1" });
+  assert.equal(fresh.get("report").hidden, true);
+  assert.equal(fresh.requests.some(({ url }) => url.startsWith("/api/analysis/")), false);
+  const ai = await workspace({ persistent: true, mode: "ai", stored: "ws_11111111-1111-4111-8111-111111111111" });
+  assert.match(ai.get("answers").textContent, /A saved answer/);
 });

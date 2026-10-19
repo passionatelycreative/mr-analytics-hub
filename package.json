@@ -3,7 +3,7 @@
   "private": true,
   "scripts": {
     "start": "python app.py",
-    "check": "node --check static/js/analytics-workspace.js",
-    "test": "python -m unittest discover -s tests -v && node --test tests/frontend.test.cjs"
+    "check": "node --check static/js/analytics-workspace.js && node --check static/js/account.js && node --check static/js/customer-dashboard.js",
+    "test": "python -m unittest discover -s tests -v && node tests/frontend.test.cjs && node tests/accounts.test.cjs"
   }
 }

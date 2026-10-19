@@ -2,26 +2,29 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="description" content="Your Mr Analytics workspace for CSV exploration, research, and AI-assisted analysis.">
-  <title>Workspace | Mr Analytics</title><link rel="stylesheet" href="/static/css/analytics-workspace.css">
+  <title>My dashboard | Mr Analytics</title><link rel="stylesheet" href="/static/css/analytics-workspace.css"><link rel="stylesheet" href="/static/css/accounts.css">
+  <script src="/static/js/account.js" defer></script><script src="/static/js/customer-dashboard.js" defer></script>
 </head>
 <body class="app-shell">
   <a class="skip-link" href="#main">Skip to content</a>
   <header class="site-header"><div class="header-inner">
     <a class="brand" href="/" aria-label="Mr Analytics home"><span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span>Mr <span>Analytics</span></a>
-    <nav class="site-nav" aria-label="Main navigation"><a href="platform.html" aria-current="page">Workspace</a><a href="dashboard.html">Data analytics</a><a href="research.html">Research</a><a href="ai-assistant.html">AI analyst</a></nav>
+    <nav class="site-nav" aria-label="Main navigation"><a href="/platform.html" aria-current="page">My dashboard</a><a href="/dashboard.html">Data analytics</a><a href="/research.html">Research</a><a href="/ai-assistant.html">AI analyst</a><a class="nav-cta" href="/login.html" data-account-signin>Sign in</a><button class="nav-auth-button" type="button" data-account-signout hidden>Sign out</button></nav>
   </div></header>
   <main class="page" id="main">
-    <div class="page-heading"><div><p class="eyebrow">Your analytics workspace</p><h1>Bring a question.<br>Start with the evidence.</h1><p class="lede">Explore a dataset, give your research direction, or work through a question with the analyst. Choose where you want to begin.</p></div><a class="button" href="dashboard.html">Upload a CSV <span aria-hidden="true">↗</span></a></div>
-    <div class="grid grid-3">
-      <article class="panel step-card"><span class="number">01 / DATA ANALYTICS</span><h2>Know your data</h2><p>Inspect your CSV's rows and columns, review numeric summaries, and check for gaps before you analyze.</p><a class="button button-secondary" href="dashboard.html">Explore a dataset →</a></article>
-      <article class="panel step-card"><span class="number">02 / RESEARCH</span><h2>Find your direction</h2><p>Shape a useful research question, choose your measures, and build a plan for collecting better evidence.</p><a class="button button-secondary" href="research.html">Open research guides →</a></article>
-      <article class="panel step-card"><span class="number">03 / AI ANALYST</span><h2>Ask the next question</h2><p>Use your uploaded dataset as the starting point for focused questions about quality, patterns, and your next research steps.</p><a class="button button-secondary" href="ai-assistant.html">Open the analyst →</a></article>
-    </div>
-    <section class="section grid grid-aside" aria-labelledby="before-title">
-      <div class="panel"><p class="eyebrow">Before the first chart</p><h2 id="before-title">A little preparation goes a long way.</h2><ul class="check-list"><li><strong>One row, one observation.</strong> Keep your dataset's structure consistent, whether each row is a response, event, or customer.</li><li><strong>Give columns clear names.</strong> A single header row makes it easier to understand measures and categories.</li><li><strong>Know what a value means.</strong> Record units, time periods, and any codes used for missing data.</li><li><strong>Start with a specific question.</strong> “Which regions have the most missing responses?” is easier to investigate than “What does this mean?”</li></ul></div>
-      <aside class="panel panel-accent"><p class="eyebrow">A useful starting point</p><h2>What are you trying to learn?</h2><p>Define the decision your analysis should support before choosing a chart or asking for an interpretation.</p><a class="text-link" href="/research-planning.html">Build a research plan →</a><div class="divider"></div><p class="help-text">Use these guides alongside your own sources, study notes, and datasets.</p></aside>
+    <div class="page-heading account-dashboard-heading"><div><p class="eyebrow">Your personal analytics workspace</p><h1>Room for your next discovery.</h1><p class="lede">Welcome, <span data-account-name>researcher</span>. Your saved work is here, ready when you are.</p></div><a class="button" href="/dashboard.html?new=1">New analysis <span aria-hidden="true">↗</span></a></div>
+    <section class="panel panel-accent workspace-continue" id="workspace-continue" aria-labelledby="continue-title" hidden><div><p class="eyebrow">Pick up where you left off</p><h2 id="continue-title"></h2><p id="continue-saved"></p></div><a class="button" id="continue-workspace" href="/dashboard.html">Continue analysis <span aria-hidden="true">→</span></a></section>
+    <section id="workspace-collection" aria-labelledby="workspace-list-title" aria-busy="true">
+      <div class="workspace-toolbar"><div><h2 id="workspace-list-title" tabindex="-1">Your saved work</h2><span class="workspace-count" id="workspace-count" hidden></span></div><div class="workspace-search-field" id="workspace-search-field" hidden><label for="workspace-search">Find a workspace</label><input type="search" id="workspace-search" placeholder="Search by name or filename" autocomplete="off"></div></div>
+      <p class="workspace-loading" id="workspace-loading" role="status">Loading your saved workspaces…</p><p class="account-form-status" id="workspace-list-status" role="status" aria-live="polite"></p><button class="button button-secondary button-small" id="workspace-retry" type="button" hidden>Try again</button>
+      <div class="workspace-list" id="workspace-list"></div>
+      <div class="empty-state workspace-empty" id="workspace-empty" hidden><span class="empty-mark" aria-hidden="true">↗</span><p class="eyebrow">A clear place to start</p><h3>Your first finding starts here.</h3><p>Upload a CSV to create your first workspace. Your report, notes, and analysis progress will be saved to this account.</p><a class="button" href="/dashboard.html?new=1">Start an analysis →</a></div>
+      <p class="notice" id="workspace-no-results" hidden>No workspaces match that search. Try another name or filename.</p>
     </section>
+    <section class="workspace-secondary-tools grid grid-2" aria-label="More ways to explore"><article class="panel"><p class="eyebrow">The research desk</p><h3>Start with a better question.</h3><p>Use practical guides to plan your study and keep your findings connected to evidence.</p><a class="text-link" href="/research.html">Explore research guides →</a></article><article class="panel"><p class="eyebrow">Your analytical partner</p><h3>Keep the investigation moving.</h3><p>Open a saved analysis to ask the AI analyst about your dataset and keep the conversation in your workspace.</p><a class="text-link" href="/ai-assistant.html">Open the AI analyst →</a></article></section>
+    <noscript><p class="notice warning">Enable JavaScript in your browser to open and manage saved workspaces.</p></noscript>
   </main>
-  <footer class="site-footer"><span>Mr Analytics · Research & data analytics</span><a href="research.html">Research guides</a></footer>
+  <dialog id="workspace-delete-dialog" class="workspace-delete-dialog" aria-labelledby="delete-workspace-title" aria-describedby="delete-workspace-description"><h2 id="delete-workspace-title">Delete this workspace?</h2><p id="delete-workspace-description">This permanently removes <strong id="delete-workspace-name"></strong> and its saved analysis, notes, and conversation from your account.</p><div class="actions"><button type="button" class="button button-secondary" id="cancel-workspace-delete">Keep workspace</button><button type="button" class="button" id="confirm-workspace-delete">Delete workspace</button></div><p id="delete-workspace-status" class="account-form-status error" role="status" aria-live="polite"></p></dialog>
+  <footer class="site-footer"><span>Mr Analytics · Research & data analytics</span><span>Your work. Ready when you are.</span></footer>
 </body>
 </html>

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Sign in to Mr Analytics to continue your saved datasets, research, and analysis.">
+  <title>Sign in | Mr Analytics</title>
+  <link rel="stylesheet" href="/static/css/analytics-workspace.css"><link rel="stylesheet" href="/static/css/accounts.css">
+  <script src="/static/js/account.js" defer></script>
+</head>
+<body class="app-shell">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header"><div class="header-inner">
+    <a class="brand" href="/" aria-label="Mr Analytics home"><span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span>Mr <span>Analytics</span></a>
+    <nav class="site-nav" aria-label="Main navigation"><a href="/platform.html">My dashboard</a><a href="/dashboard.html">Data analytics</a><a href="/research.html">Research</a><a href="/ai-assistant.html">AI analyst</a><a class="nav-cta" href="/login.html" aria-current="page" data-account-signin>Sign in</a><button class="nav-auth-button" type="button" data-account-signout hidden>Sign out</button></nav>
+  </div></header>
+  <main class="page account-layout" id="main">
+    <section class="account-story" aria-labelledby="account-title"><p class="eyebrow">Your space to find the answer</p><h1 id="account-title">Pick up where you left off.</h1><p class="lede" id="account-intro">Sign in to open your saved analytics workspaces.</p><ul class="check-list"><li><strong>Keep your work together.</strong> Save your datasets, reports, and research notes in your account.</li><li><strong>Return to the same place.</strong> Continue your analysis from your dashboard, even on another device.</li><li><strong>Build on what you learn.</strong> Keep the questions and findings alongside the data.</li></ul></section>
+    <section class="panel account-form-panel" aria-label="Account access">
+      <div class="account-mode-switch" role="group" aria-label="Account action"><button type="button" data-account-mode="login" aria-pressed="true">Sign in</button><button type="button" data-account-mode="signup" aria-pressed="false">Create account</button></div>
+      <h2>Welcome to Mr Analytics</h2>
+      <form id="account-form"><fieldset id="account-fields" disabled><legend class="sr-only">Your account details</legend>
+        <div class="field" id="display-name-field" hidden><label for="display-name">Your name</label><input id="display-name" name="display_name" type="text" autocomplete="name" maxlength="100"></div>
+        <div class="field"><label for="account-email">Email address</label><input id="account-email" name="email" type="email" autocomplete="email" maxlength="254" required></div>
+        <div class="field"><label for="account-password">Password</label><input id="account-password" name="password" type="password" autocomplete="current-password" maxlength="256" required aria-describedby="password-help"><p class="help-text" id="password-help" hidden>Use at least 12 characters.</p></div>
+      </fieldset><button class="button" type="submit" id="account-submit" disabled>Sign in</button><p class="account-form-status" id="account-status" role="status" aria-live="polite">Connecting to your account…</p></form>
+      <p class="account-existing-note">Already have a Mr Analytics account? Use your existing email and password to sign in.</p>
+      <noscript><p class="notice warning">Enable JavaScript in your browser to sign in and load your saved workspaces.</p></noscript>
+    </section>
+  </main>
+  <footer class="site-footer"><span>Mr Analytics · Research & data analytics</span><a href="/research.html">Explore research guides</a></footer>
+</body>
+</html>

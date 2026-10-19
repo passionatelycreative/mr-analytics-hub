@@ -1,0 +1,68 @@
+.site-nav .nav-auth-button { display: inline-flex; align-items: center; min-height: 44px; padding: .6rem .95rem; border: 1px solid var(--border); border-radius: 11px; color: var(--text); background: rgba(255,255,255,.6); font-size: .86rem; font-weight: 550; white-space: nowrap; }
+.site-nav .nav-auth-button:hover { color: var(--accent-strong); border-color: rgba(182,29,44,.3); }
+.account-session-status { margin-bottom: 2rem; }
+.account-layout { display: grid; grid-template-columns: 1fr minmax(320px,.85fr); align-items: center; gap: clamp(2rem,6vw,6rem); min-height: 65vh; }
+.account-story { max-width: 600px; }
+.account-story h1 { max-width: 570px; }
+.account-story .check-list { max-width: 480px; margin-top: 2rem; }
+.account-story .check-list li { margin-bottom: 1.4rem; }
+.account-form-panel { padding: clamp(1.5rem,3vw,2.5rem); }
+.account-mode-switch { display: grid; grid-template-columns: 1fr 1fr; gap: .35rem; padding: .35rem; margin-bottom: 2rem; border: 1px solid var(--border); border-radius: 14px; background: rgba(245,240,244,.7); }
+.account-mode-switch button { padding: .7rem 1rem; border: 1px solid transparent; border-radius: 10px; color: var(--muted); background: transparent; font-size: .9rem; font-weight: 600; }
+.account-mode-switch button[aria-pressed="true"] { color: var(--accent-strong); border-color: rgba(182,29,44,.12); background: rgba(255,255,255,.95); box-shadow: 0 3px 12px rgba(46,27,35,.04); }
+.account-form-panel h2 { font-size: 1.5rem; }
+.account-form-panel fieldset { min-width: 0; margin: 0; padding: 0; border: 0; }
+.account-form-panel .button { width: 100%; }
+.account-form-panel .field { margin-bottom: 1.3rem; }
+.account-form-panel .help-text { margin-bottom: 0; }
+.account-form-status { margin: 1rem 0 0; color: var(--muted); font-size: .86rem; line-height: 1.7; overflow-wrap: anywhere; }
+.account-form-status:empty { display: none; }
+.account-form-status.error { color: var(--danger); }
+.account-form-status.success { color: var(--positive); }
+.account-form-status.warning { color: var(--warning); }
+.account-existing-note { padding-top: 1.3rem; margin-top: 1.5rem; border-top: 1px solid var(--border); color: var(--muted); font-size: .8rem; }
+.account-dashboard-heading { margin-bottom: 2rem; }
+.account-dashboard-heading h1 { margin-bottom: .8rem; }
+.workspace-continue { display: flex; align-items: center; justify-content: space-between; gap: 2rem; padding: 2rem 2.2rem; margin-bottom: 3rem; }
+.workspace-continue .eyebrow { margin-bottom: .65rem; }
+.workspace-continue h2 { margin-bottom: .7rem; overflow-wrap: anywhere; }
+.workspace-continue p:last-child { margin-bottom: 0; font-size: .82rem; }
+.workspace-continue > .button { flex-shrink: 0; }
+.workspace-toolbar { display: flex; align-items: flex-end; justify-content: space-between; flex-wrap: wrap; gap: 1.3rem; margin: 2rem 0 1.5rem; }
+.workspace-toolbar h2 { display: inline; margin: 0; font-size: 1.6rem; }
+.workspace-count { display: inline-block; margin-left: .8rem; color: var(--muted); font-size: .8rem; }
+.workspace-search-field { width: min(100%,300px); }
+.workspace-search-field label { margin-bottom: .35rem; font-size: .76rem; }
+.workspace-search-field input { padding: .65rem .9rem; font-size: .85rem; background: rgba(255,255,255,.75); }
+.workspace-list { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 1.3rem; }
+.workspace-card { display: flex; align-items: flex-start; flex-direction: column; padding: 1.6rem; }
+.workspace-card-heading { display: flex; align-items: center; gap: .9rem; width: 100%; margin-bottom: 1.3rem; }
+.workspace-file-mark { display: grid; place-items: center; flex-shrink: 0; width: 42px; height: 48px; border: 1px solid rgba(182,29,44,.12); border-radius: 10px; color: var(--accent); background: var(--accent-soft); font-family: Consolas,monospace; font-size: .67rem; font-weight: 700; }
+.workspace-card h3 { min-width: 0; margin: 0; font-size: 1.05rem; line-height: 1.4; overflow-wrap: anywhere; }
+.workspace-card h3 a { color: var(--text); text-decoration: none; }
+.workspace-card h3 a:hover { color: var(--accent); text-decoration: underline; }
+.workspace-card .workspace-filename { width: 100%; margin-bottom: .5rem; font-size: .82rem; overflow-wrap: anywhere; }
+.workspace-card .workspace-dimensions { margin-bottom: .8rem; color: var(--text); font-size: .82rem; }
+.workspace-card .workspace-date { margin-bottom: 1.5rem; font-size: .75rem; }
+.workspace-card-actions { gap: .5rem; width: 100%; margin-top: auto; }
+.workspace-delete-button { min-height: 40px; padding: .45rem .5rem; margin-left: auto; border: 1px solid transparent; border-radius: 8px; color: var(--muted); background: transparent; font-size: .78rem; }
+.workspace-delete-button:hover { color: var(--danger); background: var(--accent-soft); }
+.workspace-rename-form { width: 100%; margin-top: .3rem; }
+.workspace-rename-form .actions { margin-top: .8rem; gap: .5rem; }
+.workspace-rename-form input { font-size: .85rem; }
+.workspace-loading { padding: 2rem 0; color: var(--muted); font-size: .9rem; }
+.workspace-empty { margin-top: 1rem; }
+.workspace-empty .button { margin-top: .75rem; }
+.workspace-secondary-tools { margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--border); }
+.workspace-secondary-tools .panel { padding: 1.6rem; }
+.workspace-secondary-tools h3 { font-size: 1.03rem; }
+.workspace-secondary-tools p { font-size: .85rem; }
+.workspace-delete-dialog { width: min(480px,calc(100% - 2rem)); max-height: calc(100vh - 3rem); padding: 2rem; border: 1px solid var(--border); border-radius: var(--radius); color: var(--text); background: #fff; box-shadow: 0 24px 100px rgba(46,27,35,.18); }
+.workspace-delete-dialog::backdrop { background: rgba(37,27,33,.35); backdrop-filter: blur(5px); }
+.workspace-delete-dialog h2 { font-size: 1.5rem; }
+.workspace-delete-dialog p { color: var(--muted); font-size: .9rem; }
+#delete-workspace-name { color: var(--text); overflow-wrap: anywhere; }
+.workspace-delete-dialog .actions { margin-top: 1.5rem; }
+@media (max-width:1100px) { .workspace-list { grid-template-columns: repeat(2,minmax(0,1fr)); } .site-nav .nav-auth-button { padding: .55rem .7rem; font-size: .82rem; } }
+@media (max-width:800px) { .account-layout { grid-template-columns: 1fr; gap: 2rem; } .account-story { max-width: 100%; } .account-story .check-list { display: none; } .account-form-panel { max-width: 600px; width: 100%; } .workspace-continue { align-items: flex-start; flex-direction: column; gap: 1.5rem; } }
+@media (max-width:600px) { .workspace-list { grid-template-columns: 1fr; } .workspace-continue { padding: 1.6rem; } .workspace-toolbar { align-items: flex-start; flex-direction: column; } .workspace-search-field { width: 100%; } .workspace-count { margin-left: .4rem; } .site-nav .nav-auth-button { padding: .5rem .6rem; font-size: .76rem; } }

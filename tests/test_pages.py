@@ -23,7 +23,7 @@ class PageRouteTests(unittest.TestCase):
         pages = (
             "/", "/index.html", "/platform.html", "/dashboard.html",
             "/research.html", "/ai-assistant.html", "/market-research.html",
-            "/investment-research.html", "/research-planning.html", "/login.html",
+            "/investment-research.html", "/research-planning.html", "/login.html", "/signup.html",
         )
         for path in pages:
             with self.subTest(path=path):
@@ -39,7 +39,7 @@ class PageRouteTests(unittest.TestCase):
         }
         for path in ("/", "/platform.html", "/dashboard.html", "/research.html", "/ai-assistant.html"):
             with self.subTest(path=path):
-                with self.client.get(path) as response:
+                with self.client.get(path, follow_redirects=True) as response:
                     page = response.get_data(as_text=True)
                 links = LinkParser()
                 links.feed(page)
