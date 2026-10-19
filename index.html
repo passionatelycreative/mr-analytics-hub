@@ -1,185 +1,36 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mr. Analytics</title>
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #0f172a;
-            color: #f8fafc;
-            display: flex;
-            justify-content: center;
-            min-height: 100vh;
-            margin: 0;
-        }
-        .container 
-    /* Your container styles will go here later */
-        {
-            max-width: 720px;
-            width: 100%;
-            padding: 2rem;
-            box-sizing: border-box;
-            text-align: center;
-        }
-        h1 {
-            color: #38bdf8;
-            margin-bottom: 0.5rem;
-        }
-        p {
-            color: #94a3b8;
-            font-size: 1.1rem;
-        }
-        .button-link {
-    display: block;
-margin: 0 auto;
-    background-color: #38bdf8; /* Sleek sky blue background */
-    color: #0f172a;            /* Dark text color for contrast */
-    padding: 0.75rem 1.5rem;   /* Padding makes it a box shape */
-    border-radius: 8px;        /* Rounded modern corners */
-    text-decoration: none;     /* Removes the default underline */
-    font-weight: bold;
-    transition: background-color 0.3s ease; /* Smooth transition animation */
-}
-.login-button {
-    margin-top: 1rem;
-    background-color: transparent;
-    color: #38bdf8;
-    border: 2px solid #38bdf8;
-    width: auto;
-}
-
-.login-button:hover {
-    background-color: #38bdf8;
-    color: #0f172a;
-}
-.input-field {
-    display: block;
-    width: 80%;
-    max-width: 300px;
-    margin: 0 auto 1.5rem auto; /* Centers the box and leaves space below it */
-    padding: 0.75rem;
-    border: 2px solid #334155;
-    border-radius: 8px;
-    background-color: #0f172a;
-    color: #f8fafc;
-    font-size: 1rem;
-    outline: none;
-    transition: border-color 0.3s ease;
-}
-/* This makes the border glow blue when a user clicks into it */
-.input-field:focus {
-    border-color: #38bdf8;
-}.success-text {
-    color: #34d399;
-    font-weight: bold;
-    margin-top: 1.5rem;
-    font-size: 1.1rem;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-}
-</style>
-    <link rel="stylesheet" href="static/css/mr-analytics.css">
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Mr Analytics brings research, CSV exploration, and AI-assisted data analysis into one focused workspace.">
+  <title>Mr Analytics | Research & Data Analytics</title><link rel="stylesheet" href="/static/css/analytics-workspace.css">
 </head>
-<body class="ma-app">
-    <div class="container">
-
-        <h1>welcome to M&R RESEARCH inc.</h1>
-
-        <p>where top analysis still exist in todays world</p>
-
-        <form id="lead-form">
-
-            <input
-                type="email"
-                id="register-email"
-                placeholder="Enter your email address"
-                class="input-field"
-                required
-            >
-
-            <input
-                type="password"
-                id="register-password"
-                placeholder="Create a password"
-                class="input-field"
-                required
-                minlength="6"
-            >
-
-            <button
-                type="submit"
-                class="button-link"
-                style="border: none; cursor: pointer; width: auto;"
-            >
-                REGISTER
-            </button>
-
-        </form>
-
-        <a href="/login.html" class="button-link login-button">
-            LOGIN
-        </a>
-
-        <p id="success-msg" class="success-text" style="display: none;">
-            Thank you! Your analysis is preparing...
-        </p>
-
-        <div style="position: relative; width: 100%; max-width: 600px; margin: 20px auto;">
-            <canvas id="myAnalyticsChart"></canvas>
-        </div>
-
-    </div>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-<script>
-    const SUPABASE_URL = "https://hlxlchoslbejmivwrgzi.supabase.co";
-    const SUPABASE_ANON_KEY = "sb_publishable_tDWf8vEEhHs8QIcBpxajfg_rL0D-WI2";
-
-    const supabaseClient = window.supabase.createClient(
-        SUPABASE_URL,
-        SUPABASE_ANON_KEY
-    );
-</script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-document.getElementById('lead-form').addEventListener('submit', async function(event) {
-    event.preventDefault();
-
-    const email = document.getElementById('register-email').value.trim();
-    const password = document.getElementById('register-password').value;
-    const successMessage = document.getElementById('success-msg');
-
-    try {
-        successMessage.style.display = 'none';
-
-        const { data, error } = await supabaseClient.auth.signUp({
-            email: email,
-            password: password
-        });
-
-        if (error) {
-            throw error;
-        }
-
-        console.log("Registered user:", data.user);
-
-        successMessage.textContent =
-            "Registration successful. You can now log in.";
-
-        successMessage.style.display = 'block';
-
-        setTimeout(() => {
-            window.location.href = '/login.html';
-        }, 1500);
-
-    } catch (error) {
-        console.error("Registration error:", error);
-
-        alert(error.message);
-    }
-});
-</script>
+<body class="app-shell">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header"><div class="header-inner">
+    <a class="brand" href="/" aria-label="Mr Analytics home"><span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span>Mr <span>Analytics</span></a>
+    <nav class="site-nav" aria-label="Main navigation"><a href="platform.html">Workspace</a><a href="dashboard.html">Data analytics</a><a href="research.html">Research</a><a href="ai-assistant.html">AI analyst</a><a class="nav-cta" href="platform.html">Open workspace</a></nav>
+  </div></header>
+  <main class="page" id="main">
+    <section class="hero" aria-labelledby="hero-title">
+      <div><p class="eyebrow">Research. Explore. Understand.</p><h1 id="hero-title">Turn your data<br>into a <span class="accent">clearer</span><br>next step.</h1><p class="lede">A focused workspace for curious minds. Bring your CSV, explore what it contains, and turn a good question into a useful finding.</p><div class="actions"><a class="button" href="dashboard.html">Analyze a CSV <span aria-hidden="true">↗</span></a><a class="button button-secondary" href="research.html">Explore research</a></div><p class="hero-note">Open the workspace directly. No account needed to get started.</p></div>
+      <div class="hero-workflow" aria-label="The research and analysis process">
+        <div class="workflow-topline"><span>FROM QUESTION TO EVIDENCE</span><span class="workflow-dot" aria-hidden="true"></span></div>
+        <div class="workflow-item"><span class="workflow-index">01</span><h3>Start with a question</h3><p>Define what you need to learn and which evidence matters.</p></div>
+        <div class="workflow-item"><span class="workflow-index">02</span><h3>Get to know your data</h3><p>Inspect columns, missing values, and the patterns in your CSV.</p></div>
+        <div class="workflow-item"><span class="workflow-index">03</span><h3>Make the finding useful</h3><p>Ask focused questions. Check the evidence. Decide what comes next.</p></div>
+        <div class="workflow-foot"><span>CSV exploration</span><span>Research guides</span><span>AI analyst</span></div>
+      </div>
+    </section>
+    <section class="section" aria-labelledby="tools-title">
+      <div class="section-heading"><div><p class="eyebrow">Made for the work that matters</p><h2 id="tools-title">One workspace. Better questions.</h2></div><a class="text-link" href="platform.html">Open your workspace <span aria-hidden="true">→</span></a></div>
+      <div class="grid grid-3">
+        <article class="panel step-card"><span class="number">01 / EXPLORE</span><h3>Understand your dataset</h3><p>Upload a CSV and see its structure, numeric summaries, and data quality issues before drawing conclusions.</p><a class="text-link" href="dashboard.html">Open data analytics →</a></article>
+        <article class="panel step-card"><span class="number">02 / INVESTIGATE</span><h3>Give your research direction</h3><p>Use practical guides to frame a research question, compare evidence, and plan a market study.</p><a class="text-link" href="research.html">Browse research guides →</a></article>
+        <article class="panel step-card"><span class="number">03 / ASK</span><h3>Take the next analytical step</h3><p>Ask focused questions about data quality, patterns, and useful next steps, using your computed report as the starting point.</p><a class="text-link" href="ai-assistant.html">Open AI analyst →</a></article>
+      </div>
+    </section>
+  </main>
+  <footer class="site-footer"><span>Mr Analytics · Research & data analytics</span><span>Evidence first. Clearer decisions.</span></footer>
 </body>
 </html>
