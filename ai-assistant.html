@@ -1,8 +1,35 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>AI Assistant | M&R Analytics</title><link rel="stylesheet" href="static/css/mr-analytics.css"></head>
-<body class="ma-app">
-    <header class="ma-header"><div class="ma-shell ma-header-inner"><a class="ma-brand" href="platform.html">M&R <span>Analytics</span></a><nav class="ma-nav" aria-label="Primary"><a href="platform.html">Platform Hub</a><a href="research.html">Research</a></nav></div></header>
-    <main class="ma-shell ma-page"><p class="ma-eyebrow">AI Workspace</p><h1 class="ma-page-title">AI Assistant</h1><section class="ma-empty-state"><p class="ma-status">Assistant unavailable</p><h2>The AI Assistant workspace is not available yet.</h2><p>When the assistant is introduced, this will be the dedicated space for conversations, analysis support, and reusable prompts.</p><a class="ma-button ma-button-secondary" href="platform.html">Back to Platform Hub</a></section></main>
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AI analyst | Mr Analytics</title>
+  <link rel="stylesheet" href="/static/css/analytics-workspace.css">
+  <link rel="stylesheet" href="/static/css/workbench.css">
+  <script src="/static/js/analytics-workspace.js" defer></script>
+</head>
+<body class="app-shell" data-workspace="ai">
+  <a class="skip-link" href="#main-content">Skip to content</a>
+  <header class="site-header"><div class="header-inner">
+    <a class="brand" href="/index.html"><span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span>Mr <span>Analytics</span></a>
+    <nav class="site-nav" aria-label="Main navigation"><a href="/platform.html">Workspace</a><a href="/dashboard.html">Data analytics</a><a href="/research.html">Research</a><a href="/ai-assistant.html" aria-current="page">AI analyst</a></nav>
+  </div></header>
+  <main class="page" id="main-content">
+    <div class="page-heading"><div><p class="eyebrow">YOUR RESEARCH PARTNER</p><h1>Good questions. Clearer insights.</h1><p class="muted">Ask about your dataset's computed summary, spot issues, and decide what to investigate next.</p></div></div>
+    <div class="grid analyst-layout">
+      <aside class="panel"><p class="eyebrow">ACTIVE DATASET</p><h2 id="active-dataset">No dataset selected</h2><p class="muted" id="dataset-description">Upload a CSV in the data workspace to begin.</p><a class="button button-secondary" href="/dashboard.html">Open data workspace</a><hr><h3>Start with a question</h3><div class="question-prompts"><button type="button" class="prompt-button" data-question="Summarize the most important patterns in this dataset.">What stands out?</button><button type="button" class="prompt-button" data-question="Which data quality issues should I fix first, and why?">What should I clean first?</button><button type="button" class="prompt-button" data-question="What research questions can I investigate next, based on this summary?">What should I explore next?</button></div><p class="muted small">The analyst receives aggregate statistics and column names, not raw records. It cannot inspect individual rows or calculate new groupings. Each question is independent.</p></aside>
+      <section class="panel"><div class="panel-heading"><h2>Ask about your data</h2><span class="tag">AI analyst</span></div>
+        <p id="ai-status" class="notice" role="status" aria-live="polite">Checking AI availability…</p>
+        <form id="question-form">
+          <label for="question">Your question</label><textarea id="question" name="question" rows="4" maxlength="2000" required placeholder="For example: which quality issues should I address before using this dataset?"></textarea>
+          <label for="ai-access-code">AI access code</label><input type="password" id="ai-access-code" autocomplete="off" required aria-describedby="access-help"><p id="access-help" class="muted small">Use the access code provided by the workspace owner.</p>
+          <label class="consent-label"><input type="checkbox" id="ai-consent" required><span>I agree to send my question, column names, and aggregate dataset statistics to OpenAI for this answer.</span></label>
+          <button class="button" id="ask-button" type="submit" disabled>Ask analyst</button>
+        </form>
+        <p id="question-status" class="status" role="status" aria-live="polite"></p>
+        <div id="answers" class="chat-messages" aria-live="polite"></div>
+        <p class="muted small">AI can make mistakes. Check its interpretation against the statistics and your source data.</p>
+      </section>
+    </div>
+  </main>
 </body>
 </html>

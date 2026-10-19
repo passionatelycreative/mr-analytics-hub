@@ -1,6 +1,17 @@
 import unittest
+from html.parser import HTMLParser
 
 from app import app
+
+
+class LinkParser(HTMLParser):
+    def __init__(self):
+        super().__init__()
+        self.destinations = []
+
+    def handle_starttag(self, tag, attributes):
+        if tag == "a":
+            self.destinations.extend(value for key, value in attributes if key == "href")
 
 
 class PageRouteTests(unittest.TestCase):
@@ -8,85 +19,49 @@ class PageRouteTests(unittest.TestCase):
         app.config.update(TESTING=True)
         self.client = app.test_client()
 
-    def test_all_feature_pages_have_routes(self):
+    def test_analytics_and_research_pages_load(self):
         pages = (
-            "/",
-            "/login.html",
-            "/platform.html",
-            "/banking.html",
-            "/crypto.html",
-            "/crypto-portfolio.html",
-            "/dashboard.html",
-            "/research.html",
-            "/portfolio.html",
-            "/transactions.html",
-            "/accounts.html",
-            "/deposit.html",
-            "/withdrawal.html",
-            "/transfer.html",
-            "/customer-care.html",
-            "/support-console.html",
-            "/ai-assistant.html",
-            "/market-research.html",
-            "/investment-research.html",
+            "/", "/index.html", "/platform.html", "/dashboard.html",
+            "/research.html", "/ai-assistant.html", "/market-research.html",
+            "/investment-research.html", "/research-planning.html", "/login.html",
         )
         for path in pages:
             with self.subTest(path=path):
-                self.assertEqual(self.client.get(path).status_code, 200)
+                with self.client.get(path, follow_redirects=True) as response:
+                    self.assertEqual(response.status_code, 200)
+                    self.assertIn("text/html", response.content_type)
 
-    def test_hub_links_to_real_feature_destinations(self):
-        response = self.client.get("/platform.html")
-        page = response.get_data(as_text=True)
-
-        self.assertIn('href="banking.html"', page)
-        self.assertIn('href="dashboard.html"', page)
-        self.assertIn('href="research.html"', page)
-        self.assertIn('href="ai-assistant.html"', page)
-        self.assertIn('href="crypto.html"', page)
-        self.assertIn('href="customer-care.html"', page)
-
-    def test_crypto_has_a_dedicated_workspace(self):
-        crypto_page = self.client.get("/crypto.html").get_data(as_text=True)
-        banking_page = self.client.get("/banking.html").get_data(as_text=True)
-
-        self.assertIn("Crypto Analytics", crypto_page)
-        self.assertIn('fetch("/api/crypto"', crypto_page)
-        self.assertIn("BTC, ETH, SOL, ADA, XRP", crypto_page)
-        self.assertIn('href="crypto.html"', banking_page)
-        self.assertNotIn("updateCryptoMarket", banking_page)
-
-    def test_banking_actions_have_dedicated_destinations(self):
-        banking_page = self.client.get("/banking.html").get_data(as_text=True)
-
-        for destination in (
-            "deposit.html",
-            "withdrawal.html",
-            "transfer.html",
-            "transactions.html",
-            "portfolio.html",
-            "accounts.html",
-            "crypto.html",
-            "customer-care.html",
-        ):
-            with self.subTest(destination=destination):
-                self.assertIn(f'href="{destination}"', banking_page)
-
-    def test_empty_pages_are_explicit_about_unavailable_data(self):
-        expected_content = {
-            "/portfolio.html": "No portfolio data yet.",
-            "/transactions.html": "No transactions yet.",
-            "/accounts.html": "Account management is not available yet.",
-            "/deposit.html": "No deposit activity yet.",
-            "/withdrawal.html": "No withdrawal activity yet.",
-            "/transfer.html": "No transfer activity yet.",
-            "/crypto-portfolio.html": "No portfolio data yet.",
-            "/customer-care.html": "No conversations yet.",
-            "/support-console.html": "No support requests yet.",
-            "/ai-assistant.html": "not available yet.",
+    def test_navigation_keeps_visitors_in_analytics_and_research(self):
+        removed_destinations = {
+            "banking.html", "crypto.html", "crypto-portfolio.html", "accounts.html",
+            "portfolio.html", "transactions.html", "deposit.html", "withdrawal.html",
+            "transfer.html", "customer-care.html", "support-console.html",
         }
-        for path, content in expected_content.items():
+        for path in ("/", "/platform.html", "/dashboard.html", "/research.html", "/ai-assistant.html"):
             with self.subTest(path=path):
-                self.assertIn(content, self.client.get(path).get_data(as_text=True))
+                with self.client.get(path) as response:
+                    page = response.get_data(as_text=True)
+                links = LinkParser()
+                links.feed(page)
+                for destination in links.destinations:
+                    self.assertNotIn(destination.lstrip("/").split("?")[0], removed_destinations)
+
+    def test_removed_financial_pages_and_apis_are_unavailable(self):
+        paths = (
+            "/banking.html", "/crypto.html", "/crypto-portfolio.html", "/accounts.html",
+            "/portfolio.html", "/transactions.html", "/deposit.html", "/withdrawal.html",
+            "/transfer.html", "/customer-care.html", "/support-console.html",
+            "/api/account", "/api/transactions", "/api/crypto",
+        )
+        for path in paths:
+            with self.subTest(path=path):
+                self.assertIn(self.client.get(path).status_code, (404, 410))
+        self.assertIn(self.client.post("/register", json={"email": "test@example.com"}).status_code, (404, 410))
+
+    def test_health_endpoint_does_not_require_external_services(self):
+        response = self.client.get("/healthz")
+        self.assertEqual(response.status_code, 200)
+        self.assertIsInstance(response.get_json(), dict)
 
 
 if __name__ == "__main__":

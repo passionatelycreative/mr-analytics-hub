@@ -1,5 +1,29 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Investment Research | M&R Analytics</title><link rel="stylesheet" href="static/css/mr-analytics.css"></head>
-<body class="ma-app"><header class="ma-header"><div class="ma-shell ma-header-inner"><a class="ma-brand" href="platform.html">M&R <span>Analytics</span></a><nav class="ma-nav" aria-label="Primary"><a href="platform.html">Platform Hub</a><a href="research.html">Research</a></nav></div></header><main class="ma-shell ma-page"><p class="ma-eyebrow">Research Workspace</p><h1 class="ma-page-title">Investment Research</h1><section class="ma-empty-state"><p class="ma-status">Research data unavailable</p><h2>No investment research data yet.</h2><p>Investment analyses and saved research will appear here when this capability is connected to data services.</p><a class="ma-button ma-button-secondary" href="research.html">Back to Research</a></section></main></body>
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="description" content="A practical guide to defining research questions, selecting measures, and planning a focused data analysis.">
+  <title>Research Planning | Mr Analytics</title><link rel="stylesheet" href="/static/css/analytics-workspace.css">
+</head>
+<body class="app-shell">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header"><div class="header-inner">
+    <a class="brand" href="/" aria-label="Mr Analytics home"><span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span>Mr <span>Analytics</span></a>
+    <nav class="site-nav" aria-label="Main navigation"><a href="platform.html">Workspace</a><a href="dashboard.html">Data analytics</a><a href="research.html" aria-current="page">Research</a><a href="ai-assistant.html">AI analyst</a></nav>
+  </div></header>
+  <main class="page" id="main">
+    <p class="breadcrumb"><a href="research.html">Research</a> <span aria-hidden="true"> / </span> Research planning</p>
+    <div class="page-heading"><div><p class="eyebrow">Research guide / 01</p><h1>A clear question.<br>A practical plan.</h1><p class="lede">Give your analysis a purpose before you open the dataset. This short framework helps you define what to learn, what to measure, and how to judge the evidence.</p></div></div>
+    <nav class="topic-index" aria-label="Guide sections"><a href="#scope">Set the scope</a><a href="#measures">Choose measures</a><a href="#quality">Check the data</a><a href="#conclude">Draw conclusions</a></nav>
+    <div class="guide-layout">
+      <div>
+        <section class="panel guide-section" id="scope"><p class="eyebrow">Step 01</p><h2>Connect the question to a decision</h2><p>Write the problem in one sentence, name the people or process involved, and set a time period. Then state what you will do differently once you have an answer.</p><p class="question-example">“Where are support requests taking longest to resolve this quarter, and which queues should we investigate first?”</p><p>List what is outside the study. A defined scope keeps unrelated observations from becoming the main story.</p></section>
+        <section class="panel guide-section" id="measures"><p class="eyebrow">Step 02</p><h2>Choose measures you can explain</h2><ol><li><strong>Identify the outcome.</strong> Define the quantity or category that directly answers the question.</li><li><strong>Specify the unit.</strong> State whether a row is a person, response, or event, and record the units for numeric columns.</li><li><strong>Choose relevant comparisons.</strong> Decide which time periods or groups you need and use consistent definitions.</li><li><strong>Set a comparison point.</strong> A previous period, stated target, or clear baseline helps make a result interpretable.</li></ol></section>
+        <section class="panel guide-section" id="quality"><p class="eyebrow">Step 03</p><h2>Check what the dataset can support</h2><ul class="check-list"><li><strong>Coverage:</strong> Does the dataset include the population and time period your question concerns?</li><li><strong>Completeness:</strong> Which columns contain missing values, and could those gaps affect the result?</li><li><strong>Consistency:</strong> Are categories, dates, and measurement units used consistently?</li><li><strong>Unusual values:</strong> Are extreme values valid observations, recording errors, or signs of a different process?</li><li><strong>Provenance:</strong> Can you explain where the records came from and how they were collected?</li></ul></section>
+        <section class="panel guide-section" id="conclude"><p class="eyebrow">Step 04</p><h2>Keep the conclusion close to the evidence</h2><p>Summarize the main observation, show the relevant comparison, and state any limitations. Distinguish what you observed from possible explanations.</p><p>End with a practical next step: a follow-up question, a change to test, or additional data to collect. Revisit the original question before deciding the research is complete.</p></section>
+      </div>
+      <aside class="panel guide-aside"><p class="eyebrow">Your research brief</p><h2>Six lines to start with</h2><p>Use these prompts in your own notes before uploading a dataset.</p><ol class="muted"><li>The question I want to answer…</li><li>The decision it will inform…</li><li>The people or process in scope…</li><li>The time period and comparison…</li><li>The measures and data I need…</li><li>The limitations I should check…</li></ol><div class="divider"></div><a class="button" href="dashboard.html">Inspect your dataset →</a><p class="help-text">Start with a CSV containing a single header row and one consistent observation per row.</p></aside>
+    </div>
+  </main>
+  <footer class="site-footer"><span>Mr Analytics · Research & data analytics</span><a href="research.html">Back to research guides</a></footer>
+</body>
 </html>

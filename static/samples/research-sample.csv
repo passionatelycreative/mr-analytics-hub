@@ -1,0 +1,13 @@
+month,region,responses,satisfaction_score,response_time_hours
+January,North,120,4.2,12
+January,South,98,3.9,18
+February,North,135,4.4,10
+February,South,110,4.1,15
+March,North,142,4.5,9
+March,South,118,,14
+April,North,151,4.6,8
+April,South,125,4.2,13
+May,North,160,4.7,7
+May,South,132,4.3,12
+June,North,174,4.8,6
+June,South,140,4.4,11

@@ -1,5 +1,29 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Market Research | M&R Analytics</title><link rel="stylesheet" href="static/css/mr-analytics.css"></head>
-<body class="ma-app"><header class="ma-header"><div class="ma-shell ma-header-inner"><a class="ma-brand" href="platform.html">M&R <span>Analytics</span></a><nav class="ma-nav" aria-label="Primary"><a href="platform.html">Platform Hub</a><a href="research.html">Research</a></nav></div></header><main class="ma-shell ma-page"><p class="ma-eyebrow">Research Workspace</p><h1 class="ma-page-title">Market Research</h1><section class="ma-empty-state"><p class="ma-status">Research data unavailable</p><h2>No market research data yet.</h2><p>Market research sources and saved investigations will appear here when this workspace is connected to data services.</p><a class="ma-button ma-button-secondary" href="research.html">Back to Research</a></section></main></body>
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="description" content="A practical guide to audience research, survey quality, and meaningful market comparisons.">
+  <title>Market & Audience Research | Mr Analytics</title><link rel="stylesheet" href="/static/css/analytics-workspace.css">
+</head>
+<body class="app-shell">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header"><div class="header-inner">
+    <a class="brand" href="/" aria-label="Mr Analytics home"><span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span>Mr <span>Analytics</span></a>
+    <nav class="site-nav" aria-label="Main navigation"><a href="platform.html">Workspace</a><a href="dashboard.html">Data analytics</a><a href="research.html" aria-current="page">Research</a><a href="ai-assistant.html">AI analyst</a></nav>
+  </div></header>
+  <main class="page" id="main">
+    <p class="breadcrumb"><a href="research.html">Research</a> <span aria-hidden="true"> / </span> Market & audience research</p>
+    <div class="page-heading"><div><p class="eyebrow">Research guide / 02</p><h1>Understand your audience.<br>Question the assumptions.</h1><p class="lede">Use customer feedback, surveys, and observational data to investigate a need, then check whether the evidence supports your interpretation.</p></div></div>
+    <nav class="topic-index" aria-label="Guide sections"><a href="#question">Define the question</a><a href="#collect">Collect evidence</a><a href="#compare">Compare groups</a><a href="#report">Report findings</a></nav>
+    <div class="guide-layout">
+      <div>
+        <section class="panel guide-section" id="question"><p class="eyebrow">Step 01</p><h2>Make the question specific</h2><p>Choose an audience, an outcome, and a time period. Write down the decision you want the evidence to inform.</p><p class="question-example">“Which onboarding steps do first-time users most often find difficult?”</p><p>A focused question helps you identify the feedback to collect and the categories you will need in your dataset.</p></section>
+        <section class="panel guide-section" id="collect"><p class="eyebrow">Step 02</p><h2>Collect evidence with context</h2><ol><li><strong>Define who is included.</strong> Record how participants were recruited and who might be missing from the sample.</li><li><strong>Use clear, neutral questions.</strong> Avoid leading language and questions that ask about two things at once.</li><li><strong>Keep collection methods consistent.</strong> Record dates, channels, response options, and how incomplete responses are handled.</li><li><strong>Remove identifying information you do not need.</strong> Use anonymous respondent identifiers when preparing a CSV for analysis.</li></ol></section>
+        <section class="panel guide-section" id="compare"><p class="eyebrow">Step 03</p><h2>Compare like with like</h2><p>Start by counting responses and checking missing values. Then compare relevant groups using the same definitions and time window.</p><ul class="check-list"><li>Show both group sizes and percentages so small samples are visible.</li><li>Check whether category labels differ only in spelling or capitalization.</li><li>Look for differences in the way groups were recruited or surveyed.</li><li>Treat an observed association as a starting point for investigation; it does not establish a cause.</li></ul></section>
+        <section class="panel guide-section" id="report"><p class="eyebrow">Step 04</p><h2>Write a finding someone can use</h2><p>State the question, describe your sample, and present the observation with its limits. Keep recommendations tied to the evidence and identify what you need to learn next.</p><p class="question-example">“Among the people who responded, this step was mentioned most often. We should test a simpler version and check whether completion improves.”</p></section>
+      </div>
+      <aside class="panel guide-aside"><p class="eyebrow">Prepare your CSV</p><h2>A useful starting structure</h2><p>Use one row per respondent or observation. Clear column names could include:</p><ul class="check-list"><li><code>respondent_id</code> — an anonymous reference</li><li><code>response_date</code> — when it was collected</li><li><code>audience_group</code> — your relevant segment</li><li><code>rating</code> — a defined numeric scale</li><li><code>feedback</code> — an open-text response</li></ul><div class="divider"></div><a class="button" href="dashboard.html">Explore your CSV →</a><p class="help-text">These are suggested columns, not required fields. Use names that fit your study.</p></aside>
+    </div>
+  </main>
+  <footer class="site-footer"><span>Mr Analytics · Research & data analytics</span><a href="research.html">Back to research guides</a></footer>
+</body>
 </html>

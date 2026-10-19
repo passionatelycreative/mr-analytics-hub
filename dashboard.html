@@ -1,195 +1,46 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Researcher Workspace | M&R Analytics</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-        body { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: #f8fafc; min-height: 100vh; display: flex; flex-direction: column; }
-        header { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(56, 189, 248, 0.1); padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
-        header h1 { font-size: 1.2rem; letter-spacing: 0.05em; text-transform: uppercase; color: #38bdf8; }
-        .user-badge { background: rgba(56, 189, 248, 0.1); border: 1px solid #38bdf8; padding: 0.4rem 1rem; border-radius: 20px; font-size: 0.85rem; color: #38bdf8; }
-        .hub-link { color: #94a3b8; font-size: 0.85rem; text-decoration: none; }
-        .hub-link:hover { color: #38bdf8; }
-        main { flex: 1; padding: 2rem; max-width: 1200px; width: 100%; margin: 0 auto; }
-        .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
-        .metric-card { background: rgba(30, 41, 59, 0.5); border: 1px solid rgba(255, 255, 255, 0.05); padding: 1.5rem; border-radius: 12px; }
-        .metric-card h3 { font-size: 0.85rem; text-transform: uppercase; color: #94a3b8; margin-bottom: 0.5rem; }
-        .metric-card p { font-size: 1.8rem; font-weight: bold; color: #f8fafc; }
-        .workspace-box { background: rgba(30, 41, 59, 0.3); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 16px; padding: 2.5rem; text-align: center; margin-bottom: 2rem; }
-        .upload-zone { border: 2px dashed rgba(56, 189, 248, 0.3); border-radius: 12px; padding: 3rem 2rem; cursor: pointer; transition: all 0.3s ease; }
-        .upload-zone:hover, .upload-zone.is-dragging { border-color: #38bdf8; background: rgba(56, 189, 248, 0.06); }
-        .upload-icon { font-size: 2.5rem; color: #38bdf8; margin-bottom: 1rem; }
-        .upload-btn { background: #38bdf8; color: #0f172a; border: none; padding: 0.75rem 1.5rem; font-weight: bold; border-radius: 6px; margin-top: 1rem; cursor: pointer; transition: background 0.2s; }
-        .upload-btn:hover { background: #0ea5e9; }
-        .upload-btn.secondary { background: transparent; border: 1px solid #475569; color: #f8fafc; }
-        .upload-btn:disabled { cursor: not-allowed; opacity: .55; }
-        .status { min-height: 1.5rem; margin-top: 1rem; color: #94a3b8; }
-        .status.success { color: #34d399; } .status.error { color: #fb7185; }
-        .results-panel { background: rgba(15, 23, 42, 0.5); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 12px; padding: 1.5rem; min-height: 200px; text-align: left; }
-        .results-panel h2 { font-size: 1.1rem; color: #34d399; margin-bottom: 1rem; text-transform: uppercase; }
-        .placeholder-text { color: #64748b; font-style: italic; }
-        .hidden { display: none; }
-        .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: .75rem; margin: 1rem 0 1.5rem; }
-        .metric { background: rgba(30, 41, 59, .8); border: 1px solid #334155; border-radius: 8px; padding: 1rem; }
-        .metric dt { color: #94a3b8; font-size: .8rem; text-transform: uppercase; } .metric dd { margin: .35rem 0 0; font-size: 1.5rem; font-weight: 700; }
-        .analysis-section { margin-top: 1.5rem; } .analysis-section h3 { font-size: 1rem; margin-bottom: .75rem; }
-        .table-wrap { overflow-x: auto; border: 1px solid #334155; border-radius: 8px; }
-        table { width: 100%; border-collapse: collapse; min-width: 540px; } th, td { padding: .65rem .75rem; border-bottom: 1px solid #334155; text-align: left; white-space: nowrap; } th { color: #38bdf8; background: rgba(30, 41, 59, .9); font-size: .85rem; } td { color: #dbeafe; font-size: .9rem; } tr:last-child td { border-bottom: 0; }
-        .workspace-actions { display: flex; justify-content: flex-end; gap: .75rem; }
-        @media (max-width: 600px) { header { padding: 1rem; } main { padding: 1rem; } .workspace-box { padding: 1rem; } }
-    </style>
-    <link rel="stylesheet" href="static/css/mr-analytics.css">
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Data workspace | Mr Analytics</title>
+  <link rel="stylesheet" href="/static/css/analytics-workspace.css">
+  <link rel="stylesheet" href="/static/css/workbench.css">
+  <script src="/static/js/analytics-workspace.js" defer></script>
 </head>
-<body class="ma-app">
-    <header>
-        <h1>M&R Research Analytics Hub</h1>
-        <div>
-            <a class="hub-link" href="platform.html">Back to Platform Hub</a>
-            <span class="user-badge">Verified Researcher</span>
+<body class="app-shell" data-workspace="analysis">
+  <a class="skip-link" href="#main-content">Skip to content</a>
+  <header class="site-header"><div class="header-inner">
+    <a class="brand" href="/index.html"><span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span>Mr <span>Analytics</span></a>
+    <nav class="site-nav" aria-label="Main navigation"><a href="/platform.html">Workspace</a><a href="/dashboard.html" aria-current="page">Data analytics</a><a href="/research.html">Research</a><a href="/ai-assistant.html">AI analyst</a></nav>
+  </div></header>
+  <main class="page" id="main-content">
+    <div class="page-heading"><div><p class="eyebrow">THE DATA WORKSPACE</p><h1>Make sense of your data.</h1><p class="muted">Start with a CSV. Find patterns, check its quality, and turn the results into better research.</p></div></div>
+    <section class="panel" aria-labelledby="upload-heading">
+      <div class="panel-heading"><h2 id="upload-heading">Bring your dataset</h2><span class="tag">CSV</span></div>
+      <form id="upload-form">
+        <div class="upload-zone" id="upload-zone">
+          <p class="upload-symbol" aria-hidden="true">↥</p><h3>Drop your CSV here</h3>
+          <label for="csv-file">Or choose a file from your device</label>
+          <input id="csv-file" name="file" type="file" accept=".csv,text/csv" aria-describedby="upload-help">
+          <p id="upload-help" class="muted">UTF-8 CSV · Up to 10 MB · 100,000 rows · 100 columns</p>
         </div>
-    </header>
-    <main>
-        <div class="metrics-grid">
-            <div class="metric-card"><h3>Datasets Analyzed</h3><p id="datasetsAnalyzed">0</p></div>
-            <div class="metric-card"><h3>Total Rows Processed</h3><p id="rowsProcessed">0</p></div>
-            <div class="metric-card"><h3>System Status</h3><p id="systemStatus" style="color: #34d399;">Ready</p></div>
-        </div>
-
-        <div class="workspace-box" aria-labelledby="workspace-heading">
-            <div class="upload-zone" id="uploadZone" tabindex="0" role="button" aria-describedby="uploadHelp">
-                <div class="upload-icon" aria-hidden="true">+</div>
-                <h3 id="workspace-heading">Data Analyst Workspace</h3>
-                <p id="uploadHelp" style="color: #64748b; margin-top: 0.5rem; font-size: 0.9rem;">Drop a CSV file here or browse local files. Maximum 10 MB, 100,000 rows, and 100 columns.</p>
-                <button class="upload-btn" id="browseButton" type="button">Browse Local Files</button>
-                <input type="file" id="csvFileInput" accept=".csv,text/csv" hidden>
-            </div>
-            <p class="status" id="statusMessage" role="status" aria-live="polite">No active data stream detected.</p>
-            <div class="workspace-actions">
-                <button type="button" id="processCsvBtn" class="upload-btn" disabled>Upload &amp; Process CSV</button>
-                <button type="button" id="removeDatasetBtn" class="upload-btn secondary hidden">Remove Dataset</button>
-            </div>
-        </div>
-
-        <div class="results-panel" id="resultsPanel">
-            <h2>Analysis Output Terminal</h2>
-            <p class="placeholder-text" id="resultsPlaceholder">Upload a CSV dataset above to analyze it inside this workspace.</p>
-            <div id="analysisContent" class="hidden">
-                <div class="summary-grid" id="summaryGrid"></div>
-                <div class="analysis-section"><h3>Schema</h3><div class="table-wrap"><table id="schemaTable"></table></div></div>
-                <div class="analysis-section"><h3>Numeric Descriptive Statistics</h3><div class="table-wrap"><table id="statsTable"></table></div></div>
-                <div class="analysis-section"><h3>Data Preview (First 100 Rows)</h3><div class="table-wrap"><table id="previewTable"></table></div></div>
-            </div>
-        </div>
-    </main>
-    <script>
-        const MAX_FILE_BYTES = 10 * 1024 * 1024;
-        const allowedTypes = ["text/csv", "application/csv", "application/vnd.ms-excel", "application/octet-stream", "text/plain"];
-        const fileInput = document.getElementById("csvFileInput");
-        const browseButton = document.getElementById("browseButton");
-        const uploadZone = document.getElementById("uploadZone");
-        const processButton = document.getElementById("processCsvBtn");
-        const removeButton = document.getElementById("removeDatasetBtn");
-        const statusMessage = document.getElementById("statusMessage");
-        const analysisContent = document.getElementById("analysisContent");
-        const resultsPlaceholder = document.getElementById("resultsPlaceholder");
-        let selectedFile = null;
-
-        function setState(state, message) {
-            statusMessage.className = `status ${state === "success" ? "success" : state === "error" ? "error" : ""}`;
-            statusMessage.textContent = message;
-            processButton.disabled = !selectedFile || ["validating", "processing"].includes(state);
-            removeButton.classList.toggle("hidden", !selectedFile);
-            processButton.textContent = state === "processing" ? "Processing..." : "Upload & Process CSV";
-            document.getElementById("systemStatus").textContent = state === "processing" ? "Processing" : state === "error" ? "Needs attention" : "Ready";
-        }
-
-        function validateFile(file) {
-            if (!file) throw new Error("Please choose a CSV file.");
-            if (!file.name || file.name.includes("\0") || file.name.trim() !== file.name) throw new Error("The filename is invalid.");
-            if (!file.name.toLowerCase().endsWith(".csv")) throw new Error("Only CSV files are supported.");
-            if (file.size === 0) throw new Error("The selected file is empty.");
-            if (file.size > MAX_FILE_BYTES) throw new Error("The CSV file is too large. Maximum size is 10 MB.");
-            if (file.type && !allowedTypes.includes(file.type)) throw new Error("The selected file is not a CSV.");
-        }
-
-        function selectFile(file) {
-            setState("validating", "Validating file...");
-            try {
-                validateFile(file);
-                selectedFile = file;
-                browseButton.textContent = `Selected: ${file.name}`;
-                setState("selected", "File selected. Ready to process.");
-            } catch (error) {
-                selectedFile = null;
-                browseButton.textContent = "Browse Local Files";
-                setState("error", error.message);
-            }
-        }
-
-        browseButton.addEventListener("click", (event) => { event.stopPropagation(); fileInput.click(); });
-        uploadZone.addEventListener("click", () => fileInput.click());
-        uploadZone.addEventListener("keydown", (event) => { if (event.key === "Enter" || event.key === " ") fileInput.click(); });
-        fileInput.addEventListener("change", () => selectFile(fileInput.files[0]));
-        uploadZone.addEventListener("dragover", (event) => { event.preventDefault(); uploadZone.classList.add("is-dragging"); });
-        uploadZone.addEventListener("dragleave", () => uploadZone.classList.remove("is-dragging"));
-        uploadZone.addEventListener("drop", (event) => { event.preventDefault(); uploadZone.classList.remove("is-dragging"); selectFile(event.dataTransfer.files[0]); });
-
-        function addCell(row, value, header = false) {
-            const cell = document.createElement(header ? "th" : "td");
-            cell.textContent = value === null || value === undefined ? "" : String(value);
-            row.appendChild(cell);
-        }
-        function renderTable(table, headers, rows) {
-            table.replaceChildren();
-            const head = table.createTHead().insertRow();
-            headers.forEach((header) => addCell(head, header, true));
-            const body = table.createTBody();
-            rows.forEach((values) => { const row = body.insertRow(); values.forEach((value) => addCell(row, value)); });
-        }
-        function renderAnalysis(analysis) {
-            const metrics = [["Rows", analysis.rows], ["Columns", analysis.columns], ["Duplicate rows", analysis.duplicate_rows], ["Preview rows", analysis.preview.length]];
-            const summaryGrid = document.getElementById("summaryGrid");
-            summaryGrid.replaceChildren();
-            metrics.forEach(([label, value]) => { const metric = document.createElement("dl"); metric.className = "metric"; const term = document.createElement("dt"); term.textContent = label; const detail = document.createElement("dd"); detail.textContent = value; metric.append(term, detail); summaryGrid.appendChild(metric); });
-            renderTable(document.getElementById("schemaTable"), ["Column", "Detected type", "Missing values"], analysis.column_names.map((column) => [column, analysis.column_types[column], analysis.missing_values[column]]));
-            const statColumns = Object.keys(analysis.numeric_statistics);
-            renderTable(document.getElementById("statsTable"), ["Statistic", ...statColumns], ["count", "mean", "std", "min", "25%", "50%", "75%", "max"].map((stat) => [stat, ...statColumns.map((column) => analysis.numeric_statistics[column][stat])]));
-            renderTable(document.getElementById("previewTable"), analysis.column_names, analysis.preview.map((row) => analysis.column_names.map((column) => row[column])));
-            analysisContent.classList.remove("hidden");
-            resultsPlaceholder.classList.add("hidden");
-            document.getElementById("datasetsAnalyzed").textContent = "1";
-            document.getElementById("rowsProcessed").textContent = analysis.rows;
-        }
-
-        processButton.addEventListener("click", async () => {
-            if (!selectedFile) return setState("error", "Please select a CSV file first.");
-            setState("processing", "Uploading and analyzing CSV...");
-            try {
-                const formData = new FormData();
-                formData.append("file", selectedFile);
-                const response = await fetch("/upload", { method: "POST", body: formData });
-                const payload = await response.json();
-                if (!response.ok || payload.status !== "success") throw new Error(payload.message || "The CSV could not be processed.");
-                renderAnalysis(payload.analysis);
-                setState("success", `Analysis complete: ${payload.analysis.filename}`);
-            } catch (error) {
-                setState("error", error.message || "Could not reach the Flask backend.");
-            }
-        });
-
-        removeButton.addEventListener("click", () => {
-            selectedFile = null;
-            fileInput.value = "";
-            browseButton.textContent = "Browse Local Files";
-            analysisContent.classList.add("hidden");
-            resultsPlaceholder.classList.remove("hidden");
-            document.getElementById("summaryGrid").replaceChildren();
-            document.getElementById("datasetsAnalyzed").textContent = "0";
-            document.getElementById("rowsProcessed").textContent = "0";
-            setState("idle", "Dataset removed. Ready for another CSV.");
-        });
-    </script>
+        <div class="actions"><button class="button" id="analyze-button" type="submit" disabled>Analyze CSV</button><button class="button button-secondary" id="sample-button" type="button">Try a sample dataset</button></div>
+      </form>
+      <p id="upload-status" class="status" role="status" aria-live="polite">Your original file is never saved. Reports expire after one hour and may be removed sooner when the workspace is busy.</p>
+    </section>
+    <section id="empty-state" class="empty-state"><p class="eyebrow">A CLEAR START</p><h2>Your data, explained.</h2><p class="muted">Upload a dataset to see its quality, numeric distributions, summary statistics, and a preview. Every result comes from your file.</p></section>
+    <div id="report" hidden>
+      <div class="report-heading"><div><p class="eyebrow">DATASET REPORT</p><h2 id="report-name"></h2><p class="muted">Statistics cover all rows. The preview shows the first 100.</p></div><div class="actions"><button class="button button-secondary" id="download-report" type="button">Download report</button><button class="button button-secondary" id="remove-report" type="button">Remove dataset</button></div></div>
+      <div class="stats" id="report-stats"></div>
+      <div class="grid grid-2">
+        <section class="panel"><div class="panel-heading"><h2>What stands out</h2><span class="tag">Computed insights</span></div><ul class="insight-list" id="insights"></ul><p class="muted small">These are statistical observations. They do not establish cause and effect.</p></section>
+        <section class="panel"><div class="panel-heading"><h2>Distribution</h2></div><label for="chart-column">Numeric column</label><select id="chart-column"></select><div id="distribution-chart" class="distribution-chart"></div><p class="muted small">Each bar counts values in a range across the full dataset.</p></section>
+      </div>
+      <section class="panel"><div class="panel-heading"><h2>Columns &amp; quality</h2></div><div class="table-wrap" id="schema-table"></div></section>
+      <section class="panel"><div class="panel-heading"><h2>Numeric statistics</h2></div><div class="table-wrap" id="statistics-table"></div></section>
+      <section class="panel"><div class="panel-heading"><h2>Data preview</h2><span class="tag">First 100 rows</span></div><div class="table-wrap" id="preview-table"></div></section>
+      <section class="panel ai-callout"><div><p class="eyebrow">GO ONE STEP FURTHER</p><h2>Ask your AI analyst.</h2><p class="muted">Explore the computed summary with focused questions about quality, patterns, and next steps.</p></div><a href="/ai-assistant.html" class="button" id="open-ai">Open AI analyst →</a></section>
+    </div>
+  </main>
 </body>
 </html>

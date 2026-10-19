@@ -1,5 +1,9 @@
 {
-  "dependencies": {
-    "pandas": "^0.0.3"
+  "name": "mr-analytics-hub",
+  "private": true,
+  "scripts": {
+    "start": "python app.py",
+    "check": "node --check static/js/analytics-workspace.js",
+    "test": "python -m unittest discover -s tests -v && node --test tests/frontend.test.cjs"
   }
 }

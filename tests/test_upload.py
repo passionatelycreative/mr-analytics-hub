@@ -1,5 +1,8 @@
 import io
+from pathlib import Path
+import tempfile
 import unittest
+from unittest.mock import patch
 
 from werkzeug.datastructures import FileStorage
 
@@ -8,7 +11,15 @@ from app import MAX_CSV_COLUMNS, MAX_CSV_ROWS, MAX_UPLOAD_BYTES, analyze_csv, ap
 
 class UploadTests(unittest.TestCase):
     def setUp(self):
-        app.config.update(TESTING=True)
+        storage = tempfile.TemporaryDirectory(dir=Path(__file__).resolve().parents[1])
+        self.addCleanup(storage.cleanup)
+        config = patch.dict(app.config, {
+            "TESTING": True,
+            "SECRET_KEY": "test-session-secret",
+            "ANALYSIS_DB_PATH": str(Path(storage.name) / "analysis.sqlite3"),
+        })
+        config.start()
+        self.addCleanup(config.stop)
         self.client = app.test_client()
 
     def upload(self, content, filename="data.csv", content_type="text/csv"):

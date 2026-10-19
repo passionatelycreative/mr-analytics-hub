@@ -1,448 +1,191 @@
+"""Mr Analytics: bounded CSV analysis and optional, protected AI questions."""
+import hmac
+from io import BytesIO
 import os
-import csv
-from io import StringIO
+from pathlib import Path
+import secrets
+from urllib.parse import urlsplit
 
-import pandas as pd
 from dotenv import load_dotenv
-from flask import Flask, request, jsonify, send_from_directory
-from flask_cors import CORS
-from requests.exceptions import RequestException
-from supabase import create_client
-from werkzeug.utils import secure_filename
-from crypto_service import CryptoProviderError, get_crypto_market_data
-load_dotenv()
+from flask import Flask, Request, jsonify, redirect, request, send_from_directory, session
+from werkzeug.exceptions import RequestEntityTooLarge
 
-SUPABASE_URL = os.getenv("SUPABASE_URL")
-SUPABASE_KEY = os.getenv("SUPABASE_KEY")
-if SUPABASE_URL is None or SUPABASE_KEY is None:
-    raise RuntimeError("SUPABASE_URL and SUPABASE_KEY must be set in the environment")
+from analytics import (
+    CSVValidationError, MAX_CSV_COLUMNS, MAX_CSV_ROWS, MAX_UPLOAD_BYTES,
+    analyze_csv,
+)
+from ai_service import AIUnavailableError, answer_question
+from report_store import ReportStore
 
-supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
-
-# 1. Initialize the environment variable system
-load_dotenv()
-
-app = Flask(__name__)
-CORS(app)
-
-MAX_UPLOAD_BYTES = 10 * 1024 * 1024
-MAX_CSV_ROWS = 100_000
-MAX_CSV_COLUMNS = 100
-MAX_PREVIEW_ROWS = 100
-ALLOWED_CSV_CONTENT_TYPES = {
-    "",
-    "application/csv",
-    "application/vnd.ms-excel",
-    "application/octet-stream",
-    "text/csv",
-    "text/plain",
-}
+BASE_DIR = Path(__file__).resolve().parent
+load_dotenv(BASE_DIR / ".env")
 
 
-class CSVValidationError(ValueError):
-    """An upload is valid HTTP input but not a usable CSV dataset."""
+class InMemoryUploadRequest(Request):
+    def _get_file_stream(self, total_content_length, content_type, filename=None, content_length=None):
+        # Bounded requests stay in memory, including Werkzeug's multipart parser.
+        return BytesIO()
 
 
-def _json_safe(value):
-    if pd.isna(value):
-        return None
-    if hasattr(value, "item"):
-        return value.item()
-    if hasattr(value, "isoformat"):
-        return value.isoformat()
-    return value
+app = Flask(__name__, static_folder=str(BASE_DIR / "static"))
+app.request_class = InMemoryUploadRequest
+app.config.update(
+    SECRET_KEY=os.getenv("SESSION_SECRET") or secrets.token_hex(32),
+    MAX_CONTENT_LENGTH=11 * 1024 * 1024,
+    SESSION_COOKIE_HTTPONLY=True,
+    SESSION_COOKIE_SAMESITE="Lax",
+    SESSION_COOKIE_SECURE=os.getenv("COOKIE_SECURE", "false").lower() == "true",
+    ANALYSIS_DB_PATH=os.getenv("ANALYSIS_DB_PATH", str(BASE_DIR / "instance" / "analysis.sqlite3")),
+)
 
 
-def analyze_csv(file_storage):
-    """Read a bounded UTF-8 CSV and return the analyst workspace payload."""
-    original_name = file_storage.filename or ""
-    safe_name = secure_filename(original_name)
-    if not safe_name or "\x00" in original_name:
-        raise CSVValidationError("Please choose a file with a valid filename.")
-    if not safe_name.lower().endswith(".csv"):
-        raise CSVValidationError("Only CSV files are supported.")
-    if file_storage.content_type not in ALLOWED_CSV_CONTENT_TYPES:
-        raise CSVValidationError("The uploaded file must be a CSV file.")
+def reports():
+    return ReportStore(app.config["ANALYSIS_DB_PATH"])
 
-    raw_data = file_storage.stream.read(MAX_UPLOAD_BYTES + 1)
-    if not raw_data:
-        raise CSVValidationError("The CSV file is empty.")
-    if len(raw_data) > MAX_UPLOAD_BYTES:
-        raise CSVValidationError("The CSV file is too large. Maximum size is 10 MB.")
-    try:
-        csv_text = raw_data.decode("utf-8-sig")
-    except UnicodeDecodeError as error:
-        raise CSVValidationError("The CSV must use UTF-8 encoding.") from error
-    if not csv_text.strip():
-        raise CSVValidationError("The CSV file is empty.")
 
-    try:
-        csv_rows = list(csv.reader(StringIO(csv_text), strict=True))
-    except csv.Error as error:
-        raise CSVValidationError("The CSV is malformed.") from error
-    if not csv_rows or not any(cell.strip() for cell in csv_rows[0]):
-        raise CSVValidationError("The CSV must contain a header row.")
-    header = csv_rows[0]
-    if all(cell.strip().replace(".", "", 1).isdigit() for cell in header):
-        raise CSVValidationError("The CSV must contain a header row.")
-    expected_fields = len(header)
-    if expected_fields == 0 or any(len(row) != expected_fields for row in csv_rows[1:]):
-        raise CSVValidationError("The CSV is malformed: rows have inconsistent columns.")
-    if len(csv_rows) - 1 > MAX_CSV_ROWS:
-        raise CSVValidationError("The CSV contains too many rows. Maximum is 100,000.")
+def error(message, code):
+    return jsonify(status="error", message=message), code
 
-    try:
-        dataframe = pd.read_csv(
-            StringIO(csv_text),
-            header=0,
-            skip_blank_lines=True,
-            on_bad_lines="error",
-        )
-    except (pd.errors.ParserError, pd.errors.EmptyDataError) as error:
-        raise CSVValidationError(
-            "The CSV is malformed or does not contain a header row."
-        ) from error
-    except ValueError as error:
-        raise CSVValidationError("The CSV could not be parsed.") from error
 
-    if dataframe.shape[1] == 0 or any(
-        not isinstance(column, str) or not column.strip()
-        for column in dataframe.columns
-    ):
-        raise CSVValidationError("The CSV must contain non-empty column headers.")
-    if dataframe.shape[1] > MAX_CSV_COLUMNS:
-        raise CSVValidationError("The CSV contains too many columns. Maximum is 100.")
-    if len(dataframe) > MAX_CSV_ROWS:
-        raise CSVValidationError("The CSV contains too many rows. Maximum is 100,000.")
+def ai_enabled():
+    return all(os.getenv(name, "").strip() for name in (
+        "OPENAI_API_KEY", "OPENAI_MODEL", "ANALYST_ACCESS_TOKEN"
+    ))
 
-    column_types = {}
-    numeric_statistics = {}
-    for column in dataframe.columns:
-        series = dataframe[column]
-        if pd.api.types.is_bool_dtype(series):
-            detected_type = "boolean"
-        elif pd.api.types.is_integer_dtype(series):
-            detected_type = "integer"
-        elif pd.api.types.is_float_dtype(series):
-            detected_type = "number"
-        elif pd.api.types.is_datetime64_any_dtype(series):
-            detected_type = "datetime"
-        else:
-            detected_type = "text"
-        column_types[column] = detected_type
 
-        if pd.api.types.is_numeric_dtype(series):
-            stats = series.describe()
-            numeric_statistics[column] = {
-                name: _json_safe(stats.get(name))
-                for name in ("count", "mean", "std", "min", "25%", "50%", "75%", "max")
-            }
+@app.after_request
+def response_headers(response):
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["Referrer-Policy"] = "same-origin"
+    response.headers["Content-Security-Policy"] = (
+        "default-src 'self'; script-src 'self'; style-src 'self'; "
+        "img-src 'self' data:; connect-src 'self'; object-src 'none'; "
+        "base-uri 'self'; frame-ancestors 'none'; form-action 'self'"
+    )
+    if request.path.startswith("/api/") or request.path == "/upload":
+        response.headers["Cache-Control"] = "no-store"
+    return response
 
-    preview = [
-        {column: _json_safe(value) for column, value in row.items()}
-        for row in dataframe.head(MAX_PREVIEW_ROWS).to_dict(orient="records")
-    ]
-    return {
-        "filename": safe_name,
-        "rows": len(dataframe),
-        "columns": int(dataframe.shape[1]),
-        "column_names": [str(column) for column in dataframe.columns],
-        "column_types": column_types,
-        "missing_values": {
-            str(column): int(count)
-            for column, count in dataframe.isna().sum().items()
-        },
-        "duplicate_rows": int(dataframe.duplicated().sum()),
-        "numeric_statistics": numeric_statistics,
-        "preview": preview,
-    }
-@app.route('/register', methods=['POST'])
-def register():
-    try:
-        data = request.get_json()
 
-        email = data.get('email', '').strip()
+@app.errorhandler(RequestEntityTooLarge)
+def upload_too_large(_error):
+    return error("The upload is too large. Choose a CSV file up to 10 MB.", 413)
 
-        if not email:
-            return jsonify({
-                "status": "error",
-                "message": "Email is required"
-            }), 400
 
-        response = supabase.auth.sign_up({
-            "email": email
-        })
+@app.get("/healthz")
+def healthz():
+    return jsonify(status="ok")
 
-        return jsonify({
-            "status": "success",
-            "message": "Registration received",
-            "email": email
-        })
 
-    except Exception as e:
-        return jsonify({
-            "status": "error",
-            "message": str(e)
-        }), 500
-
-@app.route('/api/account')
-def get_account():
-    try:
-        # Get the user's Supabase access token
-        auth_header = request.headers.get("Authorization")
-
-        if not auth_header or not auth_header.startswith("Bearer "):
-            return jsonify({
-                "status": "error",
-                "message": "Authentication required"
-            }), 401
-
-        access_token = auth_header.split(" ", 1)[1]
-
-        # Ask Supabase who this token belongs to
-        user_response = supabase.auth.get_user(access_token)
-
-        if not user_response or not user_response.user:
-            return jsonify({
-                "status": "error",
-                "message": "Invalid authentication token"
-            }), 401
-
-        user = user_response.user
-        user_id = user.id
-
-        # Find this user's financial account
-        account_response = (
-            supabase
-            .table("accounts")
-            .select("id, user_id, fiat_balance_usd, btc_balance, eth_balance")
-            .eq("user_id", user_id)
-            .single()
-            .execute()
-        )
-
-        account = account_response.data
-
-        if not account:
-            return jsonify({
-                "status": "error",
-                "message": "Account not found"
-            }), 404
-
-        return jsonify({
-            "status": "success",
-            "account": {
-                "id": account["id"],
-                "user_id": account["user_id"],
-                "email": user.email,
-                "fiat_balance_usd": account["fiat_balance_usd"],
-                "btc_balance": account["btc_balance"],
-                "eth_balance": account["eth_balance"]
-            }
-        })
-
-    except Exception as e:
-        return jsonify({
-            "status": "error",
-            "message": str(e)
-        }), 500
-
-# 2. Home Route
-@app.route('/')
+@app.get("/")
 def home():
-    return send_from_directory('.', 'index.html')
+    return send_from_directory(BASE_DIR, "index.html")
 
 
-# 3. Dashboard Route
-@app.route('/dashboard.html')
-def dashboard():
-    return send_from_directory('.', 'dashboard.html')
-
-@app.route('/platform.html')
-def platform():
-    return send_from_directory('.', 'platform.html')
-
-@app.route('/login.html')
+@app.get("/login.html")
 def login():
-    return send_from_directory('.', 'login.html')
-
-@app.route('/banking.html')
-def banking():
-    return send_from_directory('.', 'banking.html')
-
-@app.route('/crypto.html')
-def crypto():
-    return send_from_directory('.', 'crypto.html')
-
-@app.route('/crypto-portfolio.html')
-def crypto_portfolio():
-    return send_from_directory('.', 'crypto-portfolio.html')
-
-@app.route('/customer-care.html')
-def customer_care():
-    return send_from_directory('.', 'customer-care.html')
-
-@app.route('/support-console.html')
-def support_console():
-    return send_from_directory('.', 'support-console.html')
-
-@app.route('/portfolio.html')
-def portfolio():
-    return send_from_directory('.', 'portfolio.html')
-
-@app.route('/transactions.html')
-def transactions():
-    return send_from_directory('.', 'transactions.html')
-
-@app.route('/accounts.html')
-def accounts():
-    return send_from_directory('.', 'accounts.html')
-
-@app.route('/deposit.html')
-def deposit():
-    return send_from_directory('.', 'deposit.html')
-
-@app.route('/withdrawal.html')
-def withdrawal():
-    return send_from_directory('.', 'withdrawal.html')
-
-@app.route('/transfer.html')
-def transfer():
-    return send_from_directory('.', 'transfer.html')
-
-@app.route('/ai-assistant.html')
-def ai_assistant():
-    return send_from_directory('.', 'ai-assistant.html')
-
-@app.route('/market-research.html')
-def market_research():
-    return send_from_directory('.', 'market-research.html')
-
-@app.route('/investment-research.html')
-def investment_research():
-    return send_from_directory('.', 'investment-research.html')
+    return redirect("/platform.html")
 
 
-@app.route('/api/crypto', methods=['GET'])
-def get_crypto():
-    try:
-        market_data = get_crypto_market_data()
-    except CryptoProviderError as error:
-        app.logger.warning("Crypto provider unavailable: %s", error)
-        return jsonify({
-            "status": "unavailable",
-            "message": "Market data temporarily unavailable",
-            "assets": [],
-        }), 503
+@app.get("/<page>.html")
+def page(page):
+    if page == "research-planning":
+        return send_from_directory(BASE_DIR, "investment-research.html")
+    allowed = {"index", "platform", "dashboard", "research", "ai-assistant",
+               "market-research", "investment-research"}
+    if page not in allowed:
+        return error("This page is no longer available.", 404)
+    return send_from_directory(BASE_DIR, page + ".html")
 
-    return jsonify(market_data)
 
-# 4. Upload Route
-@app.route('/upload', methods=['POST'])
+@app.post("/upload")
 def upload_file():
-    if 'file' not in request.files:
-        return jsonify({
-            "status": "error",
-            "message": "No file uploaded"
-        }), 400
-
-    file = request.files['file']
-
-    if file.filename == '':
-        return jsonify({
-            "status": "error",
-            "message": "No file selected"
-        }), 400
-
+    if "file" not in request.files:
+        return error("No file uploaded", 400)
+    file = request.files["file"]
+    if not file.filename:
+        return error("No file selected", 400)
     try:
         analysis = analyze_csv(file)
-    except CSVValidationError as error:
-        return jsonify({
-            "status": "error",
-            "message": str(error)
-        }), 400
-    except (OSError, pd.errors.ParserError) as error:
-        app.logger.warning("CSV processing failed: %s", error)
-        return jsonify({
-            "status": "error",
-            "message": "The CSV could not be processed. Please check its contents."
-        }), 400
+    except CSVValidationError as exc:
+        return error(str(exc), 400)
+    owner = session.get("analysis_owner")
+    if not owner:
+        owner = secrets.token_urlsafe(32)
+        session["analysis_owner"] = owner
+    report_id = reports().save(owner, analysis)
+    return jsonify(status="success", message="CSV analyzed successfully",
+                   analysis=analysis, analysis_id=report_id, expires_in=3600)
 
-    return jsonify({
-        "status": "success",
-        "message": "File uploaded and analyzed successfully",
-        "analysis": analysis,
-    })
 
-# 5. research Route
-@app.route('/research.html')
-def research():
-    return send_from_directory('.', 'research.html')
-@app.route('/api/transactions', methods=['GET'])
-def get_transactions():
+def owned_report(report_id):
+    owner = session.get("analysis_owner")
+    if not owner:
+        return None
+    return reports().get(report_id, owner)
+
+
+@app.get("/api/analysis/<report_id>")
+def get_analysis(report_id):
+    analysis = owned_report(report_id)
+    if analysis is None:
+        return error("This analysis has expired or is unavailable. Upload your CSV again.", 404)
+    return jsonify(status="success", analysis=analysis, analysis_id=report_id)
+
+
+@app.delete("/api/analysis/<report_id>")
+def delete_analysis(report_id):
+    if owned_report(report_id) is None:
+        return error("Analysis not found.", 404)
+    reports().delete(report_id, session["analysis_owner"])
+    return jsonify(status="success")
+
+
+@app.get("/api/ai-status")
+def ai_status():
+    return jsonify(enabled=ai_enabled(), requires_access_code=ai_enabled())
+
+
+@app.post("/api/analysis/<report_id>/question")
+def ask_question(report_id):
+    analysis = owned_report(report_id)
+    if analysis is None:
+        return error("This analysis has expired or is unavailable. Upload your CSV again.", 404)
+    if not ai_enabled():
+        return error("AI questions are not configured yet. Your CSV analysis is still available.", 503)
+    origin = request.headers.get("Origin", "")
+    expected_origin = os.getenv("PUBLIC_ORIGIN", "").strip().rstrip("/") or request.host_url.rstrip("/")
     try:
-        # 1. Get the authenticated user's Supabase access token
-        auth_header = request.headers.get("Authorization")
+        parsed_origin = urlsplit(origin)
+        valid_origin = origin == expected_origin and parsed_origin.scheme in {"http", "https"}
+    except ValueError:
+        valid_origin = False
+    if not valid_origin:
+        return error("Please ask questions from the Mr Analytics workspace.", 403)
+    token = request.headers.get("X-Analyst-Token", "")
+    if not token:
+        auth = request.headers.get("Authorization", "")
+        if auth.startswith("Bearer "):
+            token = auth[7:]
+    if not hmac.compare_digest(token.encode(), os.environ["ANALYST_ACCESS_TOKEN"].strip().encode()):
+        return error("Enter a valid AI access code.", 401)
+    data = request.get_json(silent=True)
+    if not isinstance(data, dict) or data.get("consent") is not True:
+        return error("Please consent to sharing the dataset summary with the AI service.", 400)
+    question = data.get("question")
+    if not isinstance(question, str) or not question.strip() or len(question) > 2000:
+        return error("Enter a question between 1 and 2,000 characters.", 400)
+    if not reports().reserve_question(session["analysis_owner"]):
+        response, code = error("The hourly AI question limit has been reached. Try again later.", 429)
+        response.headers["Retry-After"] = "3600"
+        return response, code
+    try:
+        answer = answer_question(analysis, question.strip())
+    except AIUnavailableError:
+        app.logger.warning("AI provider unavailable")
+        return error("The AI service could not answer right now. Please try again later.", 503)
+    return jsonify(status="success", answer=answer)
 
-        if not auth_header or not auth_header.startswith("Bearer "):
-            return jsonify({
-                "status": "error",
-                "message": "Authentication required"
-            }), 401
 
-        access_token = auth_header.split(" ", 1)[1]
-
-        # 2. Verify the token with Supabase
-        user_response = supabase.auth.get_user(access_token)
-
-        if not user_response or not user_response.user:
-            return jsonify({
-                "status": "error",
-                "message": "Invalid authentication token"
-            }), 401
-
-        user_id = user_response.user.id
-
-        # 3. Find the user's account
-        account_response = (
-            supabase
-            .table("accounts")
-            .select("id")
-            .eq("user_id", user_id)
-            .single()
-            .execute()
-        )
-
-        account = account_response.data
-
-        if not account:
-            return jsonify({
-                "status": "error",
-                "message": "Account not found"
-            }), 404
-
-        account_id = account["id"]
-
-        # 4. Retrieve transactions belonging to this account
-        transactions_response = (
-            supabase
-            .table("transactions")
-            .select("*")
-            .eq("account_id", account_id)
-            .order("created_at", desc=True)
-            .execute()
-        )
-
-        return jsonify({
-            "status": "success",
-            "transactions": transactions_response.data or []
-        })
-
-    except Exception as e:
-        return jsonify({
-            "status": "error",
-            "message": str(e)
-        }), 500
-if __name__ == '__main__':
-    app.run(debug=True)
-
+if __name__ == "__main__":
+    app.run(host="127.0.0.1", port=int(os.getenv("PORT", "5000")), debug=False)

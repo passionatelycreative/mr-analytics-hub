@@ -1,7 +1,6 @@
 flask
-flask-cors
-supabase
 python-dotenv
 gunicorn
 requests
 pandas
+numpy
